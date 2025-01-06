@@ -13,6 +13,7 @@ import {
   type MetaFunction,
 } from "@remix-run/node";
 import { ModeToggle } from "~/components/mode-tottle";
+import { db } from "~/data/db";
 
 export const meta: MetaFunction = () => {
   return [
@@ -22,6 +23,8 @@ export const meta: MetaFunction = () => {
 };
 
 export const loader: LoaderFunction = async (args) => {
+  const result = await db.execute("select 1");
+  console.log({ result });
   const { userId } = await getAuth(args);
 
   if (!userId) {
