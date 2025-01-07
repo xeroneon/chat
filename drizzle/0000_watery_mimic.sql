@@ -1,7 +1,9 @@
+CREATE TYPE "public"."media_type" AS ENUM('image', 'video', 'audio', 'document');--> statement-breakpoint
 CREATE TABLE "group_members" (
 	"group_id" integer,
 	"user_id" integer,
-	"joined_at" timestamp DEFAULT now()
+	"joined_at" timestamp DEFAULT now(),
+	CONSTRAINT "group_members_group_id_user_id_pk" PRIMARY KEY("group_id","user_id")
 );
 --> statement-breakpoint
 CREATE TABLE "groups" (
@@ -46,7 +48,6 @@ CREATE TABLE "users" (
 	"user_id" serial PRIMARY KEY NOT NULL,
 	"username" varchar(50) NOT NULL,
 	"email" varchar(100) NOT NULL,
-	"password_hash" varchar(255) NOT NULL,
 	"created_at" timestamp DEFAULT now(),
 	"last_login" timestamp,
 	CONSTRAINT "users_username_unique" UNIQUE("username"),

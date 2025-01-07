@@ -7,17 +7,23 @@ import {
   timestamp,
   integer,
   pgEnum,
+  primaryKey,
 } from "drizzle-orm/pg-core";
 
 // Define an enum for media types to ensure consistency
-const MediaType = pgEnum("media_type", ["image", "video", "audio", "document"]);
+export const MediaType = pgEnum("media_type", [
+  "image",
+  "video",
+  "audio",
+  "document",
+]);
 
 // Users table
 export const users = pgTable("users", {
   userId: serial("user_id").primaryKey(),
+  drizzleUserId: serial("user_id").primaryKey(),
   username: varchar("username", { length: 50 }).unique().notNull(),
   email: varchar("email", { length: 100 }).unique().notNull(),
-  passwordHash: varchar("password_hash", { length: 255 }).notNull(),
   createdAt: timestamp("created_at").defaultNow(),
   lastLogin: timestamp("last_login"),
 });
@@ -39,9 +45,7 @@ export const groupMembers = pgTable(
     userId: integer("user_id").references(() => users.userId),
     joinedAt: timestamp("joined_at").defaultNow(),
   },
-  (t) => ({
-    pk: sql`PRIMARY KEY (${t.groupId}, ${t.userId})`,
-  })
+  (t) => [primaryKey({ columns: [t.groupId, t.userId] })]
 );
 
 // Messages table

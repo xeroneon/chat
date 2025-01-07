@@ -9,7 +9,9 @@
     "lint": "eslint --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint .",
     "start": "remix-serve ./build/server/index.js",
     "typecheck": "tsc",
-    "migrate": "drizzle-kit generate"
+    "migrate": "drizzle-kit migrate",
+    "generate": "drizzle-kit generate",
+    "push": "drizzle-kit push"
   },
   "dependencies": {
     "@clerk/remix": "^4.4.6",
@@ -25,6 +27,7 @@
     "isbot": "^4.1.0",
     "lucide-react": "^0.469.0",
     "pg": "^8.13.1",
+    "postgres": "^3.4.5",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "remix-themes": "^1.5.1",

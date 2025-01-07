@@ -16,6 +16,9 @@ import { dark } from "@clerk/themes";
 import { themeSessionResolver } from "./sessions.server";
 import { ThemeProvider, useTheme } from "remix-themes";
 import clsx from "clsx";
+import { db } from "./db/db";
+import { users } from "./db/schema";
+import { eq } from "drizzle-orm";
 
 export const links: LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -38,6 +41,15 @@ export const loader: LoaderFunction = (args) => {
   return rootAuthLoader(args, async ({ request }) => {
     const { getTheme } = await themeSessionResolver(request);
     const { sessionId, userId, getToken } = request.auth;
+    if (userId) {
+      //const result = await db
+      //  .select()
+      //  .from(users)
+      //  .where(eq(users.userId, parseInt(userId)));
+      const allUsers = await db.select().from(users);
+      console.log({ allUsers });
+    }
+    console.log("all", request.auth);
     // fetch data
     return { theme: getTheme() };
   });
