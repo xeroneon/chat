@@ -21,7 +21,7 @@ export const MediaType = pgEnum("media_type", [
 // Users table
 export const users = pgTable("users", {
   userId: serial("user_id").primaryKey(),
-  drizzleUserId: serial("user_id").primaryKey(),
+  clerkUserId: varchar("internal_user_id").unique().notNull(),
   username: varchar("username", { length: 50 }).unique().notNull(),
   email: varchar("email", { length: 100 }).unique().notNull(),
   createdAt: timestamp("created_at").defaultNow(),
