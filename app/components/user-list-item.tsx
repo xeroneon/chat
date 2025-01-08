@@ -18,12 +18,15 @@ type Props = {
 export default function UserListItem({ user }: Props) {
   const currentUser = useUser();
   const fetcher = useFetcher<typeof action>();
+
   const handleClick = () => {
+    console.log("sending friend request");
     fetcher.submit(
       { receiverId: user.userId },
       { method: "post", action: "/action/create-friend-request" }
     );
   };
+
   return (
     <div className="flex items-center py-4 mt-2">
       <Avatar className="mr-4">
