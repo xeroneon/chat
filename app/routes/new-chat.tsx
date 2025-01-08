@@ -49,7 +49,39 @@ export const loader = async (args: LoaderFunctionArgs) => {
     )
     .limit(1);
 
-  return { requests };
+  const friends = await db
+    .select({
+      userId: users.userId,
+      username: users.username,
+      email: users.email,
+      imageUrl: users.imageUrl,
+      becameFriendsAt: friendships.becameFriendsAt,
+    })
+    .from(friendships)
+    .where(
+      and(
+        or(
+          eq(friendships.userId1, user[0].userId),
+          eq(friendships.userId2, user[0].userId)
+        ),
+        eq(friendships.isBlocked, false)
+      )
+    )
+    .innerJoin(
+      users,
+      or(
+        and(
+          eq(friendships.userId1, user[0].userId),
+          eq(users.userId, friendships.userId2)
+        ),
+        and(
+          eq(friendships.userId2, user[0].userId),
+          eq(users.userId, friendships.userId1)
+        )
+      )
+    );
+
+  return { requests, friends };
 };
 
 export const action: ActionFunction = async ({ request }) => {
@@ -74,10 +106,10 @@ export const action: ActionFunction = async ({ request }) => {
 };
 
 export default function NewChat() {
-  const { requests } = useLoaderData<typeof loader>();
+  const { requests, friends } = useLoaderData<typeof loader>();
   const [searchParams, _] = useSearchParams();
   const { Form, data } = useFetcher<typeof action>();
-  console.log({ requests });
+  console.log({ requests, friends });
 
   const { data: usersData } = useQuery<User[]>({
     queryKey: ["searchUsers", data?.searchResults],
