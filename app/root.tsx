@@ -18,14 +18,7 @@ import clsx from "clsx";
 import { db } from "./db/db";
 import { users } from "./db/schema";
 import { eq } from "drizzle-orm";
-import { useState } from "react";
-import {
-  useQuery,
-  useMutation,
-  useQueryClient,
-  QueryClient,
-  QueryClientProvider,
-} from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const queryClient = new QueryClient();
 
@@ -57,6 +50,7 @@ async function createUser(clerkUserId: string) {
       .values({
         username: user.username as string,
         email: user.primaryEmailAddress?.emailAddress as string,
+        imageUrl: user.imageUrl,
         clerkUserId,
       })
       .returning({ userId: users.userId, username: users.username });
