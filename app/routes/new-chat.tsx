@@ -41,7 +41,12 @@ export const loader = async (args: LoaderFunctionArgs) => {
     .where(eq(users.internalUserId, userId));
 
   const requests = await friendRequestWithUsers
-    .where(eq(friendRequests.receiverId, user[0].userId))
+    .where(
+      and(
+        eq(friendRequests.receiverId, user[0].userId),
+        eq(friendRequests.status, "pending")
+      )
+    )
     .limit(1);
 
   return { requests };

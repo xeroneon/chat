@@ -20,16 +20,16 @@ type Props = {
 };
 
 export default function FriendRequestListItem({ friendRequest }: Props) {
-  const { sender } = friendRequest;
+  const { sender, requestId } = friendRequest;
   const currentUser = useUser();
   const fetcher = useFetcher<typeof action>();
 
   const handleClick = () => {
     console.log("accepting friend request");
-    //fetcher.submit(
-    //  { receiverId: user.userId },
-    //  { method: "post", action: "/action/create-friend-request" }
-    //);
+    fetcher.submit(
+      { requestId },
+      { method: "post", action: "/action/accept-friend-request" }
+    );
   };
 
   return (

@@ -1,7 +1,7 @@
 import { InferSelectModel, eq, and } from "drizzle-orm";
 import { ActionFunction, data } from "@remix-run/node";
 import { db } from "~/db/db";
-import { friendRequests, users } from "~/db/schema";
+import { friendRequests, friendships, users } from "~/db/schema";
 import { getAuth } from "@clerk/remix/ssr.server";
 
 export const action: ActionFunction = async (args) => {
@@ -19,35 +19,24 @@ export const action: ActionFunction = async (args) => {
     );
   }
 
-  const senderId = result[0].userId;
   const formData = await request.formData();
-  const receiverId = parseInt(formData.get("receiverId") as string);
-  console.log({ senderId, receiverId });
+  const requestId = parseInt(formData.get("requestId") as string);
 
-  const exists = await db
+  const friendRequest = await db
     .select()
     .from(friendRequests)
-    .where(
-      and(
-        eq(friendRequests.receiverId, receiverId),
-        eq(friendRequests.senderId, senderId)
-      )
-    );
-  console.log({ exists });
+    .where(eq(friendRequests.requestId, requestId));
 
-  if (exists.length > 0) {
-    console.log("in exists if");
-    return data(
-      { error: "This request has already been created" },
-      { status: 400 }
-    );
-  }
+  await db
+    .update(friendRequests)
+    .set({
+      status: "accepted",
+    })
+    .where(eq(friendRequests.requestId, requestId));
 
-  console.log(`creating friend request with ${receiverId} and ${senderId}`);
-  await db.insert(friendRequests).values({
-    senderId: senderId,
-    receiverId: receiverId,
+  await db.insert(friendships).values({
+    userId1: friendRequest[0].receiverId,
+    userId2: friendRequest[0].senderId,
   });
-  console.log(`created friend request with ${receiverId} and ${senderId}`);
   return {};
 };
