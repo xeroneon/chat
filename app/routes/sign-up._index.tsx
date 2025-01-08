@@ -19,6 +19,9 @@ export default function Signup() {
       <div className="w-fit dark:border-white border-black border-[3px] rounded-[14px]">
         <SignUp
           appearance={{ baseTheme: theme === "dark" ? dark : undefined }}
+          signInUrl="/sign-in"
+          routing="path"
+          path="/sign-up"
         />
       </div>
     </div>

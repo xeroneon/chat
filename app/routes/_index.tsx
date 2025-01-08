@@ -21,7 +21,7 @@ export const loader: LoaderFunction = async (args) => {
   const { userId } = await getAuth(args);
 
   if (!userId) {
-    return redirect("/signin");
+    return redirect("/sign-in");
   }
 
   return {};
