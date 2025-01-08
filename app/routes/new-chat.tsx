@@ -136,6 +136,10 @@ export default function NewChat() {
       {usersData?.map((user) => (
         <UserListItem key={user.userId} user={user} />
       ))}
+      {friends && <h1>Friends</h1>}
+      {friends?.map((user) => (
+        <UserListItem key={user.userId} user={user as any} />
+      ))}
     </div>
   );
 }
