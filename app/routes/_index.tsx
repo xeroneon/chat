@@ -37,7 +37,8 @@ export default function Index() {
       </div>
       <h1 className="text-5xl font-instrument font-bold">Chat</h1>
       <Button
-        onClick={() => navigate("/new-chat")}
+        type="button"
+        onClick={() => navigate("new-chat")}
         className="fixed right-5 bottom-5 h-16 w-16 rounded-full shadow-xl"
       >
         <PiChatTeardropDuotone size={30} />

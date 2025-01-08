@@ -39,11 +39,11 @@ export const links: LinksFunction = () => [
   },
 ];
 
-async function createUser(clerkUserId: string) {
+async function createUser(internalUserId: string) {
   const clerkClient = createClerkClient({
     secretKey: process.env.CLERK_SECRET_KEY,
   });
-  const user = await clerkClient.users.getUser(clerkUserId);
+  const user = await clerkClient.users.getUser(internalUserId);
   try {
     const newUser = await db
       .insert(users)
@@ -51,7 +51,7 @@ async function createUser(clerkUserId: string) {
         username: user.username as string,
         email: user.primaryEmailAddress?.emailAddress as string,
         imageUrl: user.imageUrl,
-        clerkUserId,
+        internalUserId,
       })
       .returning({ userId: users.userId, username: users.username });
 
@@ -70,7 +70,7 @@ export const loader: LoaderFunction = (args) => {
       const result = await db
         .select()
         .from(users)
-        .where(eq(users.clerkUserId, userId));
+        .where(eq(users.internalUserId, userId));
 
       if (result.length <= 0) {
         createUser(userId);
@@ -112,5 +112,4 @@ export function AppWithProviders() {
   );
 }
 
-// Use the dynamic theme selection in ClerkApp
 export default ClerkApp(AppWithProviders);

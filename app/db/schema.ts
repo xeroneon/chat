@@ -29,7 +29,7 @@ export const FriendRequestStatus = pgEnum("friend_request_status", [
 // Users table
 export const users = pgTable("users", {
   userId: serial("user_id").primaryKey(),
-  clerkUserId: varchar("internal_user_id").unique().notNull(),
+  internalUserId: varchar("internal_user_id").unique().notNull(),
   username: varchar("username", { length: 50 }).unique().notNull(),
   email: varchar("email", { length: 100 }).unique().notNull(),
   imageUrl: varchar("image_url", { length: 2048 }),

@@ -1,8 +1,8 @@
 import { data, LoaderFunctionArgs, ActionFunction } from "@remix-run/node";
 import { SearchInput } from "~/components/search-input";
 import { db } from "~/db/db";
-import { users } from "~/db/schema";
-import { or, ilike, InferSelectModel } from "drizzle-orm";
+import { friendRequests, friendships, users } from "~/db/schema";
+import { and, eq, or, ilike, InferSelectModel } from "drizzle-orm";
 import { useFetcher, useLoaderData, useSearchParams } from "@remix-run/react";
 import { useQuery } from "@tanstack/react-query";
 import UserListItem from "~/components/user-list-item";
