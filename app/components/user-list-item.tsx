@@ -20,15 +20,26 @@ export default function UserListItem({ user }: Props) {
   const fetcher = useFetcher<typeof action>();
 
   const handleClick = () => {
-    console.log("sending friend request");
     fetcher.submit(
       { receiverId: user.userId },
       { method: "post", action: "/action/create-friend-request" }
     );
   };
 
+  const handleComponentClick = () => {
+    const formData = new FormData();
+    [user.userId].forEach((id) => {
+      formData.append("userIds", id.toString());
+    });
+
+    fetcher.submit(formData, {
+      method: "post",
+      action: "/action/create-chat",
+    });
+  };
+
   return (
-    <div className="flex items-center py-4 mt-2">
+    <div onClick={handleComponentClick} className="flex items-center py-4 mt-2">
       <Avatar className="mr-4">
         {user?.imageUrl && <AvatarImage src={user.imageUrl} />}
         <AvatarFallback>{user.username}</AvatarFallback>
