@@ -17,8 +17,7 @@ async function createGroupAndMembers(
   memberIds: number[]
 ) {
   try {
-    let groupId: number;
-    await db.transaction(async (tx) => {
+    return await db.transaction(async (tx) => {
       const [newGroup] = await tx
         .insert(groups)
         .values({
@@ -28,8 +27,6 @@ async function createGroupAndMembers(
         })
         .returning({ groupId: groups.groupId });
 
-      groupId = newGroup.groupId;
-
       if (newGroup) {
         const memberData = memberIds.map((userId) => ({
           groupId: newGroup.groupId,
@@ -38,9 +35,8 @@ async function createGroupAndMembers(
 
         await tx.insert(groupMembers).values(memberData);
       }
+      return newGroup.groupId;
     });
-
-    console.log("Group and members created successfully.");
   } catch (error) {
     console.error("Failed to create group or add members:", error);
     throw error; // or handle it as needed
@@ -65,13 +61,7 @@ export const action: ActionFunction = async (args) => {
   const currentUserId = result[0].userId;
 
   const formData = await request.formData();
-  const receiverId = parseInt(formData.get("receiverId") as string);
   const userIds = formData.getAll("userIds") as string[];
-
-  //const chat = await db
-  //  .select()
-  //  .from(groups)
-  //  .where(eq(groups., requestId));
 
   const countOfUsers = userIds.length;
 
@@ -93,13 +83,16 @@ export const action: ActionFunction = async (args) => {
     .groupBy(groups.groupId, groups.groupName)
     .having(sql`COUNT(DISTINCT ${groupMembers.userId}) = ${countOfUsers}`)
     .limit(1);
-  console.log({ existingGroups });
 
-  const group = await createGroupAndMembers(
+  if (existingGroups.length) {
+    return redirect(`/chat/${existingGroups[0].groupId}`);
+  }
+
+  const groupId = await createGroupAndMembers(
     "test name",
     "test desc",
     currentUserId,
     [currentUserId, ...userIds.map((id) => parseInt(id, 10))]
   );
-  return {};
+  return redirect(`/chat/${groupId}`);
 };

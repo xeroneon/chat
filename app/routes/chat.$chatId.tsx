@@ -16,11 +16,15 @@ import { friendRequestWithUsers } from "~/db/queries/friend-requests";
 import FriendRequestListItem from "~/components/friend-request-list-item";
 import { getUserFriendsList } from "~/db/queries/friendships";
 import TitleSeparator from "~/components/title-separator";
+import { getCurrentGroupChatWithMessages } from "~/db/queries/chat";
+import { ChatInput } from "~/components/chat-input";
 
 type User = InferSelectModel<typeof users>;
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const { userId: clerkUserId } = await getAuth(args);
+
+  const { chatId } = args.params;
 
   if (!clerkUserId) {
     return {};
@@ -33,7 +37,15 @@ export const loader = async (args: LoaderFunctionArgs) => {
 
   const userId = user[0].userId;
 
-  return {};
+  if (!chatId) {
+    return data({ error: "No chatId provided" }, { status: 400 });
+  }
+
+  const chatData = await getCurrentGroupChatWithMessages(parseInt(chatId, 10));
+
+  console.log(chatData);
+
+  return { chatData };
 };
 
 export const action: ActionFunction = async ({ request }) => {
@@ -53,6 +65,7 @@ export default function NewChat() {
       <Link to="/" className="mx-auto mb-4">
         <h1 className="text-5xl font-instrument font-bold">Chat</h1>
       </Link>
+      <ChatInput />
     </div>
   );
 }
