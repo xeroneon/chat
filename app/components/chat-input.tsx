@@ -13,32 +13,12 @@ export function ChatInput({
   initialValue,
   ...props
 }: SearchInputProps) {
-  // Add state to handle keyboard visibility
-  const [keyboardHeight, setKeyboardHeight] = React.useState(0);
-  const handleResize = () => {
-    if (window.visualViewport) {
-      const viewportHeight = window.visualViewport.height;
-      const keyboardHeight = window.innerHeight - viewportHeight;
-      setKeyboardHeight(keyboardHeight);
-    }
-  };
-
-  React.useEffect(() => {
-    // Listen for viewport changes which occur when the keyboard opens/closes
-    window.visualViewport?.addEventListener("resize", handleResize);
-
-    return () => {
-      window.visualViewport?.removeEventListener("resize", handleResize);
-    };
-  }, []);
-
   return (
     <div
       className={cn(
-        "fixed bottom-0 w-[calc(100%-2rem)] mx-4 shrink-0 transition-all duration-300",
+        "relative w-[calc(100%-2rem)] mb-[calc(20px_+_env(keyboard-inset-height))] mx-4 transition-all duration-300",
         className
       )}
-      style={{ bottom: `${keyboardHeight + 15}px` }}
     >
       <Input
         type="input"
