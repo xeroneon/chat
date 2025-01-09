@@ -1,13 +1,7 @@
 import { eq, inArray, sql } from "drizzle-orm";
 import { ActionFunction, data, redirect } from "@remix-run/node";
 import { db } from "~/db/db";
-import {
-  friendRequests,
-  friendships,
-  groupMembers,
-  groups,
-  users,
-} from "~/db/schema";
+import { groupMembers, groups, users } from "~/db/schema";
 import { getAuth } from "@clerk/remix/ssr.server";
 
 async function createGroupAndMembers(
@@ -63,7 +57,7 @@ export const action: ActionFunction = async (args) => {
   const formData = await request.formData();
   const userIds = formData.getAll("userIds") as string[];
 
-  const countOfUsers = userIds.length;
+  const countOfUsers = userIds.length + 1;
 
   const existingGroups = await db
     .select({

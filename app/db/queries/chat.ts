@@ -71,6 +71,7 @@ export async function getChats(userId: number) {
       userId: users.userId,
       username: users.username,
       email: users.email,
+      imageUrl: users.imageUrl,
     })
     .from(groups)
     .leftJoin(groupMembers, eq(groups.groupId, groupMembers.groupId))
@@ -93,6 +94,7 @@ export async function getChats(userId: number) {
                   userId: chat.userId,
                   username: chat.username!,
                   email: chat.email!,
+                  imageUrl: chat.imageUrl!,
                 },
               ]
             : [],
@@ -102,6 +104,7 @@ export async function getChats(userId: number) {
           userId: chat.userId,
           username: chat.username!,
           email: chat.email!,
+          imageUrl: chat.imageUrl!,
         });
       }
       return acc;
@@ -112,7 +115,12 @@ export async function getChats(userId: number) {
       description: string | null;
       createdBy: number | null;
       createdAt: Date;
-      members: { userId: number; username: string; email: string }[];
+      members: {
+        userId: number;
+        username: string;
+        email: string;
+        imageUrl: string;
+      }[];
     }[]
   );
 

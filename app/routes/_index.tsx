@@ -32,11 +32,11 @@ export const loader = async (args: LoaderFunctionArgs) => {
 
   const chats = await getChats(parseInt(userId, 10));
 
-  return { chats };
+  return { chats, user: user[0] };
 };
 
 export default function Index() {
-  const { chats } = useLoaderData<typeof loader>();
+  const { chats, user } = useLoaderData<typeof loader>();
   const navigate = useNavigate();
   return (
     <div className="min-h-screen flex flex-col items-center relative">
@@ -45,9 +45,11 @@ export default function Index() {
         <UserButton />
       </div>
       <h1 className="text-5xl font-instrument font-bold">Chat</h1>
-      {chats.map((chat) => (
-        <ChatListItem chat={chat} />
-      ))}
+      <div className="w-full">
+        {chats.map((chat) => (
+          <ChatListItem chat={chat} currentUserId={user.userId} />
+        ))}
+      </div>
       <Button
         type="button"
         onClick={() => navigate("new-chat")}
