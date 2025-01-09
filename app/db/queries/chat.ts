@@ -73,3 +73,19 @@ export async function getCurrentGroupChatWithMessages(groupId: number) {
     members: groupMembersResult,
   };
 }
+
+export async function getChats(userId: number) {
+  const chats = await db
+    .select({
+      groupId: groups.groupId,
+      groupName: groups.groupName,
+      description: groups.description,
+      createdBy: groups.createdBy,
+      createdAt: groups.createdAt,
+    })
+    .from(groups)
+    .innerJoin(groupMembers, eq(groups.groupId, groupMembers.groupId))
+    .where(eq(groupMembers.userId, userId));
+
+  return chats;
+}

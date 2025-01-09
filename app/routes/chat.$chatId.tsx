@@ -61,7 +61,7 @@ export default function NewChat() {
   const { Form, data } = useFetcher<typeof action>();
 
   return (
-    <div className="flex flex-col p-4 min-h-screen">
+    <div className="flex flex-col items-center p-4">
       <Link to="/" className="mx-auto mb-4">
         <h1 className="text-5xl font-instrument font-bold">Chat</h1>
       </Link>

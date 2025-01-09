@@ -9,6 +9,8 @@ import { ModeToggle } from "~/components/mode-tottle";
 import { PiChatTeardropDuotone } from "react-icons/pi";
 import { Button } from "~/components/ui/button";
 import { useNavigate } from "@remix-run/react";
+import { getChats } from "~/db/queries/chat";
+import { getInternalUser } from "~/db/queries/users";
 
 export const meta: MetaFunction = () => {
   return [
@@ -24,7 +26,11 @@ export const loader: LoaderFunction = async (args) => {
     return redirect("/sign-in");
   }
 
-  return {};
+  const user = await getInternalUser(userId);
+
+  const chats = getChats(parseInt(userId, 10));
+
+  return { chats };
 };
 
 export default function Index() {
