@@ -1,0 +1,58 @@
+import { data, LoaderFunctionArgs, ActionFunction } from "@remix-run/node";
+import { SearchInput } from "~/components/search-input";
+import { db } from "~/db/db";
+import { friendRequests, users } from "~/db/schema";
+import { and, eq, or, ilike, InferSelectModel } from "drizzle-orm";
+import {
+  Link,
+  useFetcher,
+  useLoaderData,
+  useSearchParams,
+} from "@remix-run/react";
+import { useQuery } from "@tanstack/react-query";
+import UserListItem from "~/components/user-list-item";
+import { getAuth } from "@clerk/remix/ssr.server";
+import { friendRequestWithUsers } from "~/db/queries/friend-requests";
+import FriendRequestListItem from "~/components/friend-request-list-item";
+import { getUserFriendsList } from "~/db/queries/friendships";
+import TitleSeparator from "~/components/title-separator";
+
+type User = InferSelectModel<typeof users>;
+
+export const loader = async (args: LoaderFunctionArgs) => {
+  const { userId: clerkUserId } = await getAuth(args);
+
+  if (!clerkUserId) {
+    return {};
+  }
+
+  const user = await db
+    .select()
+    .from(users)
+    .where(eq(users.internalUserId, clerkUserId));
+
+  const userId = user[0].userId;
+
+  return {};
+};
+
+export const action: ActionFunction = async ({ request }) => {
+  const formData = await request.formData();
+  const searchTerm = formData.get("search") as string;
+
+  if (!searchTerm) {
+    return data({ error: "Search term is required" }, { status: 400 });
+  }
+};
+
+export default function NewChat() {
+  const { Form, data } = useFetcher<typeof action>();
+
+  return (
+    <div className="flex flex-col p-4 min-h-screen">
+      <Link to="/" className="mx-auto mb-4">
+        <h1 className="text-5xl font-instrument font-bold">Chat</h1>
+      </Link>
+    </div>
+  );
+}
