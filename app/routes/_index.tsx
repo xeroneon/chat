@@ -1,6 +1,7 @@
 import { UserButton } from "@clerk/remix";
 import { getAuth } from "@clerk/remix/ssr.server";
 import {
+  LoaderFunctionArgs,
   redirect,
   type LoaderFunction,
   type MetaFunction,
@@ -8,9 +9,10 @@ import {
 import { ModeToggle } from "~/components/mode-tottle";
 import { PiChatTeardropDuotone } from "react-icons/pi";
 import { Button } from "~/components/ui/button";
-import { useNavigate } from "@remix-run/react";
+import { useLoaderData, useNavigate } from "@remix-run/react";
 import { getChats } from "~/db/queries/chat";
 import { getInternalUser } from "~/db/queries/users";
+import ChatListItem from "~/components/chat-list-item";
 
 export const meta: MetaFunction = () => {
   return [
@@ -19,7 +21,7 @@ export const meta: MetaFunction = () => {
   ];
 };
 
-export const loader: LoaderFunction = async (args) => {
+export const loader = async (args: LoaderFunctionArgs) => {
   const { userId } = await getAuth(args);
 
   if (!userId) {
@@ -28,12 +30,13 @@ export const loader: LoaderFunction = async (args) => {
 
   const user = await getInternalUser(userId);
 
-  const chats = getChats(parseInt(userId, 10));
+  const chats = await getChats(parseInt(userId, 10));
 
   return { chats };
 };
 
 export default function Index() {
+  const { chats } = useLoaderData<typeof loader>();
   const navigate = useNavigate();
   return (
     <div className="min-h-screen flex flex-col items-center relative">
@@ -42,6 +45,9 @@ export default function Index() {
         <UserButton />
       </div>
       <h1 className="text-5xl font-instrument font-bold">Chat</h1>
+      {chats.map((chat) => (
+        <ChatListItem chat={chat} />
+      ))}
       <Button
         type="button"
         onClick={() => navigate("new-chat")}

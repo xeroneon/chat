@@ -79,7 +79,7 @@ export const groups = pgTable("groups", {
   groupName: varchar("group_name", { length: 100 }),
   description: text("description"),
   createdBy: integer("created_by").references(() => users.userId),
-  createdAt: timestamp("created_at").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
 // Group members table

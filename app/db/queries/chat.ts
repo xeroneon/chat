@@ -2,17 +2,7 @@ import { db } from "../db";
 import { groupMembers, groups, messages, users } from "../schema";
 import { eq, desc, sql, SQL } from "drizzle-orm";
 
-type Member = {
-  user: {
-    userId: number;
-    username: string;
-    email: string;
-  };
-};
-
 export async function getCurrentGroupChatWithMessages(groupId: number) {
-  // Query for group details with members
-
   const groupDetails = await db
     .select({
       groupId: groups.groupId,
@@ -24,7 +14,6 @@ export async function getCurrentGroupChatWithMessages(groupId: number) {
     .from(groups)
     .where(eq(groups.groupId, groupId));
 
-  // Query for group members
   const groupMembersData = await db
     .select({
       userId: users.userId,
@@ -36,7 +25,6 @@ export async function getCurrentGroupChatWithMessages(groupId: number) {
     .leftJoin(users, eq(groupMembers.userId, users.userId))
     .where(eq(groupMembers.groupId, groupId));
 
-  // Query for the last 50 messages
   const messageQuery = db
     .select({
       messageId: messages.messageId,
@@ -46,7 +34,7 @@ export async function getCurrentGroupChatWithMessages(groupId: number) {
       senderData: {
         userId: users.userId,
         username: users.username,
-        email: users.email, // Assuming these are the user details you want
+        email: users.email,
       },
     })
     .from(messages)
@@ -55,14 +43,12 @@ export async function getCurrentGroupChatWithMessages(groupId: number) {
     .orderBy(desc(messages.sentAt))
     .limit(50);
 
-  // Execute both queries within a transaction for consistency
   const [groupResult, groupMembersResult, messagesResult] =
     await db.transaction(async (tx) => {
       return Promise.all([groupDetails, groupMembersData, messageQuery]);
     });
   const group = groupResult[0];
 
-  // Combine results
   return {
     groupId: group.groupId,
     groupName: group.groupName,
@@ -82,10 +68,53 @@ export async function getChats(userId: number) {
       description: groups.description,
       createdBy: groups.createdBy,
       createdAt: groups.createdAt,
+      userId: users.userId,
+      username: users.username,
+      email: users.email,
     })
     .from(groups)
-    .innerJoin(groupMembers, eq(groups.groupId, groupMembers.groupId))
-    .where(eq(groupMembers.userId, userId));
+    .leftJoin(groupMembers, eq(groups.groupId, groupMembers.groupId))
+    .leftJoin(users, eq(groupMembers.userId, users.userId));
 
-  return chats;
+  // Group results by groupId in TypeScript since Drizzle doesn't support this out of the box
+  const groupedChats = chats.reduce(
+    (acc, chat) => {
+      const existingGroup = acc.find((g) => g.groupId === chat.groupId);
+      if (!existingGroup) {
+        acc.push({
+          groupId: chat.groupId,
+          groupName: chat.groupName,
+          description: chat.description,
+          createdBy: chat.createdBy,
+          createdAt: chat.createdAt,
+          members: chat.userId
+            ? [
+                {
+                  userId: chat.userId,
+                  username: chat.username!,
+                  email: chat.email!,
+                },
+              ]
+            : [],
+        });
+      } else if (chat.userId) {
+        existingGroup.members.push({
+          userId: chat.userId,
+          username: chat.username!,
+          email: chat.email!,
+        });
+      }
+      return acc;
+    },
+    [] as {
+      groupId: number;
+      groupName: string | null;
+      description: string | null;
+      createdBy: number | null;
+      createdAt: Date;
+      members: { userId: number; username: string; email: string }[];
+    }[]
+  );
+
+  return groupedChats;
 }
