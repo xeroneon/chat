@@ -1,44 +1,37 @@
-import {
-  data,
-  LoaderFunctionArgs,
-  ActionFunction,
-  LoaderFunction,
-} from "@remix-run/node";
+import { data, LoaderFunctionArgs, ActionFunction } from "@remix-run/node";
 import { SearchInput } from "~/components/search-input";
 import { db } from "~/db/db";
-import { friendRequests, friendships, users } from "~/db/schema";
+import { friendRequests, users } from "~/db/schema";
+import { and, eq, or, ilike, InferSelectModel } from "drizzle-orm";
 import {
-  and,
-  eq,
-  or,
-  ilike,
-  InferSelectModel,
-  aliasedTable,
-} from "drizzle-orm";
-import { useFetcher, useLoaderData, useSearchParams } from "@remix-run/react";
+  Link,
+  useFetcher,
+  useLoaderData,
+  useSearchParams,
+} from "@remix-run/react";
 import { useQuery } from "@tanstack/react-query";
 import UserListItem from "~/components/user-list-item";
 import { getAuth } from "@clerk/remix/ssr.server";
-import {
-  FriendRequestWithUsers,
-  friendRequestWithUsers,
-} from "~/db/queries/friend-requests";
+import { friendRequestWithUsers } from "~/db/queries/friend-requests";
 import FriendRequestListItem from "~/components/friend-request-list-item";
+import { getUserFriendsList } from "~/db/queries/friendships";
+import TitleSeparator from "~/components/title-separator";
 
 type User = InferSelectModel<typeof users>;
-type FriendRequest = InferSelectModel<typeof friendRequests>;
 
 export const loader = async (args: LoaderFunctionArgs) => {
-  const { userId } = await getAuth(args);
+  const { userId: clerkUserId } = await getAuth(args);
 
-  if (!userId) {
+  if (!clerkUserId) {
     return {};
   }
 
   const user = await db
     .select()
     .from(users)
-    .where(eq(users.internalUserId, userId));
+    .where(eq(users.internalUserId, clerkUserId));
+
+  const userId = user[0].userId;
 
   const requests = await friendRequestWithUsers
     .where(
@@ -49,38 +42,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
     )
     .limit(1);
 
-  const friends = await db
-    .select({
-      userId: users.userId,
-      username: users.username,
-      email: users.email,
-      imageUrl: users.imageUrl,
-      becameFriendsAt: friendships.becameFriendsAt,
-    })
-    .from(friendships)
-    .where(
-      and(
-        or(
-          eq(friendships.userId1, user[0].userId),
-          eq(friendships.userId2, user[0].userId)
-        ),
-        eq(friendships.isBlocked, false)
-      )
-    )
-    .innerJoin(
-      users,
-      or(
-        and(
-          eq(friendships.userId1, user[0].userId),
-          eq(users.userId, friendships.userId2)
-        ),
-        and(
-          eq(friendships.userId2, user[0].userId),
-          eq(users.userId, friendships.userId1)
-        )
-      )
-    );
-
+  const friends = await getUserFriendsList(userId);
   return { requests, friends };
 };
 
@@ -109,7 +71,6 @@ export default function NewChat() {
   const { requests, friends } = useLoaderData<typeof loader>();
   const [searchParams, _] = useSearchParams();
   const { Form, data } = useFetcher<typeof action>();
-  console.log({ requests, friends });
 
   const { data: usersData } = useQuery<User[]>({
     queryKey: ["searchUsers", data?.searchResults],
@@ -123,20 +84,23 @@ export default function NewChat() {
 
   return (
     <div className="flex flex-col p-4 min-h-screen">
-      <Form method="post">
+      <Link to="/" className="mx-auto mb-4">
+        <h1 className="text-5xl font-instrument font-bold">Chat</h1>
+      </Link>
+      <Form className="mb-4" method="post">
         <SearchInput initialValue={searchParams.get("search") || ""} />
       </Form>
 
-      {requests && <h1>Friend Requests</h1>}
+      {!!requests?.length && <TitleSeparator text="Friend Requests" />}
       {requests?.map((request) => (
         <FriendRequestListItem friendRequest={request} />
       ))}
 
-      {usersData && <h1>Matching Users</h1>}
+      {usersData && <TitleSeparator text="Matching Users" />}
       {usersData?.map((user) => (
         <UserListItem key={user.userId} user={user} />
       ))}
-      {friends && <h1>Friends</h1>}
+      {friends && <TitleSeparator text="Friends" />}
       {friends?.map((user) => (
         <UserListItem key={user.userId} user={user as any} />
       ))}
