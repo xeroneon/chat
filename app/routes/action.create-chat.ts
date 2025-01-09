@@ -16,9 +16,8 @@ async function createGroupAndMembers(
   creatorId: number,
   memberIds: number[]
 ) {
-
   try {
-  let groupId: number | null = null;
+    let groupId: number;
     await db.transaction(async (tx) => {
       const [newGroup] = await tx
         .insert(groups)
@@ -29,7 +28,7 @@ async function createGroupAndMembers(
         })
         .returning({ groupId: groups.groupId });
 
-      groupId = newGroup.groupId
+      groupId = newGroup.groupId;
 
       if (newGroup) {
         const memberData = memberIds.map((userId) => ({
@@ -42,7 +41,6 @@ async function createGroupAndMembers(
     });
 
     console.log("Group and members created successfully.");
-    return groupId;
   } catch (error) {
     console.error("Failed to create group or add members:", error);
     throw error; // or handle it as needed
@@ -97,9 +95,11 @@ export const action: ActionFunction = async (args) => {
     .limit(1);
   console.log({ existingGroups });
 
-  const group = await createGroupAndMembers("test name", "test desc", currentUserId, [
+  const group = await createGroupAndMembers(
+    "test name",
+    "test desc",
     currentUserId,
-    ...userIds.map((id) => parseInt(id, 10)),
-  ]);
-  return redirect(`/chat/${}`);
+    [currentUserId, ...userIds.map((id) => parseInt(id, 10))]
+  );
+  return {};
 };
