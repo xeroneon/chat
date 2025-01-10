@@ -5,11 +5,13 @@ import bcrypt from "bcrypt";
 export const authenticator = new Authenticator<User>();
 
 import { FormStrategy } from "remix-auth-form";
-import { getInternalUser, getUser } from "~/db/queries/users";
+import { getUser } from "~/db/queries/users";
 
 const verifyLogin = async (email: string, password: string) => {
   const user = await getUser(email);
-  const hash = await bcrypt.hash(password, 10);
+  const match = await bcrypt.compare(password, user[0].passwordHash);
+  console.log({ match });
+  return user;
 };
 
 // Tell the Authenticator to use the form strategy
@@ -27,7 +29,7 @@ authenticator.use(
       throw new Error("Invalid credentials");
     }
 
-    return user;
+    return user[0];
   }),
   "form"
 );

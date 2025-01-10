@@ -16,7 +16,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
   //const userData = await getInternalUser(userId);
   //need to get userId here somehow
 
-  return { chatData, userData: userData[0] };
+  return { chatData, userData: {} };
 };
 
 export const action = async ({ request, params }: ActionFunctionArgs) => {

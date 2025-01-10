@@ -18,16 +18,24 @@ export async function createUser({
   email,
   imageUrl,
   passwordHash,
-}: CreateUserParams): Promise<void> {
+}: CreateUserParams) {
   try {
-    await db.insert(users).values({
-      username,
-      email,
-      imageUrl,
-      passwordHash,
-    });
+    const userResult = await db
+      .insert(users)
+      .values({
+        username,
+        email,
+        imageUrl,
+        passwordHash,
+      })
+      .returning({
+        username: users.username,
+        email: users.email,
+        imageUrl: users.imageUrl,
+      });
 
     console.log("User created successfully");
+    return userResult[0];
   } catch (error) {
     console.error("Failed to create user:", error);
     // Here you might want to throw the error or handle it differently based on your needs
