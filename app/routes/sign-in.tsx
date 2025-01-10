@@ -1,7 +1,10 @@
-import { MetaFunction, useLoaderData } from "@remix-run/react";
+import { ActionFunctionArgs, redirect } from "@remix-run/node";
+import { MetaFunction, useFetcher, useLoaderData } from "@remix-run/react";
 import React from "react";
 import { useTheme } from "remix-themes";
+import { authenticator } from "~/auth/auth";
 import { LoginForm } from "~/components/login-form";
+import { sessionStorage } from "~/services/session.server";
 
 export const meta: MetaFunction = () => {
   return [
@@ -9,15 +12,30 @@ export const meta: MetaFunction = () => {
     { name: "description", content: "Sign in to Chat!" },
   ];
 };
+export const action = async ({ request }: ActionFunctionArgs) => {
+  console.log("action hit");
+  const user = await authenticator.authenticate("form", request);
+
+  const session = await sessionStorage.getSession(
+    request.headers.get("cookie")
+  );
+  session.set("user", user);
+
+  throw redirect("/", {
+    headers: { "Set-Cookie": await sessionStorage.commitSession(session) },
+  });
+};
 export default function Signin() {
-  const [theme] = useTheme();
-  console.log(theme);
+  const { Form } = useFetcher();
   return (
-    <div className="flex flex-col items-center justify-around h-screen">
+    <Form
+      method="post"
+      className="flex flex-col items-center justify-around h-screen"
+    >
       <h1 className="text-5xl font-instrument font-bold">Chat</h1>
       <div className="w-fit dark:border-white border-black border-[3px] rounded-[14px]">
         <LoginForm />
       </div>
-    </div>
+    </Form>
   );
 }

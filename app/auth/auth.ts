@@ -6,15 +6,17 @@ export const authenticator = new Authenticator<User>();
 
 import { FormStrategy } from "remix-auth-form";
 import { getUser } from "~/db/queries/users";
+import { redirect } from "@remix-run/node";
 
 const verifyLogin = async (email: string, password: string) => {
   const user = await getUser(email);
   const match = await bcrypt.compare(password, user[0].passwordHash);
-  console.log({ match });
+  if (!match) {
+    throw redirect("/sign-in");
+  }
   return user;
 };
 
-// Tell the Authenticator to use the form strategy
 authenticator.use(
   new FormStrategy(async ({ form }) => {
     const email = form.get("email");

@@ -38,7 +38,6 @@ export async function createUser({
     return userResult[0];
   } catch (error) {
     console.error("Failed to create user:", error);
-    // Here you might want to throw the error or handle it differently based on your needs
     throw error;
   }
 }
