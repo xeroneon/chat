@@ -14,7 +14,7 @@ export default function ChatListItem({ chat, currentUserId }: Props) {
   );
   return (
     <Link to={`/chat/${chat.groupId}`}>
-      <div className="flex items-center p-4 mt-2 w-full">
+      <div className="flex items-center active:bg-slate-300 dark:active:bg-slate-700 p-4 mt-2 w-full">
         {otherMembers.map((member) => {
           return (
             <Avatar className="mr-4">

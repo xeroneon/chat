@@ -79,3 +79,16 @@ div[data-clerk-component="signIn"] {
     @apply bg-background text-foreground;
   }
 }
+
+.chat-container {
+  min-height: 100dvh;
+  min-height: -webkit-fill-available; /* for iOS */
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.input-container {
+  position: sticky;
+  bottom: 20px;
+  /* Add padding for devices with home indicators */
+  padding-bottom: env(safe-area-inset-bottom);
+}

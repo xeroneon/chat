@@ -2,11 +2,7 @@ import * as React from "react";
 import { cn } from "~/lib/utils";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
-import {
-  PiPaperPlaneTiltDuotone,
-  PiMagnifyingGlassBold,
-  PiAirplaneBold,
-} from "react-icons/pi";
+import { PiPaperPlaneTiltDuotone } from "react-icons/pi";
 
 interface SearchInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   initialValue?: string;
@@ -20,13 +16,13 @@ export function ChatInput({
   return (
     <div
       className={cn(
-        "relative w-[calc(100%-2rem)] mb-[calc(20px_+_env(keyboard-inset-height))] mx-4 transition-all duration-300",
+        "input-container w-[calc(100%-2rem)] mx-4 transition-all duration-300",
         className
       )}
     >
       <Input
         type="input"
-        name="search"
+        name="message"
         placeholder="Message..."
         className="pr-10 rounded-full border-[3px] border-black dark:border-white"
         defaultValue={initialValue}

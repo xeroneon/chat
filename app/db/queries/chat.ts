@@ -1,6 +1,6 @@
 import { db } from "../db";
 import { groupMembers, groups, messages, users } from "../schema";
-import { eq, desc, sql, SQL } from "drizzle-orm";
+import { eq, desc, sql, SQL, asc } from "drizzle-orm";
 
 export async function getCurrentGroupChatWithMessages(groupId: number) {
   const groupDetails = await db
@@ -35,6 +35,7 @@ export async function getCurrentGroupChatWithMessages(groupId: number) {
         userId: users.userId,
         username: users.username,
         email: users.email,
+        imageUrl: users.imageUrl,
       },
     })
     .from(messages)

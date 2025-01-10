@@ -1,4 +1,9 @@
-import { data, LoaderFunctionArgs, ActionFunction } from "@remix-run/node";
+import {
+  data,
+  LoaderFunctionArgs,
+  ActionFunction,
+  ActionFunctionArgs,
+} from "@remix-run/node";
 import { SearchInput } from "~/components/search-input";
 import { db } from "~/db/db";
 import { friendRequests, users } from "~/db/schema";
@@ -46,12 +51,12 @@ export const loader = async (args: LoaderFunctionArgs) => {
   return { requests, friends };
 };
 
-export const action: ActionFunction = async ({ request }) => {
+export const action = async ({ request }: ActionFunctionArgs) => {
   const formData = await request.formData();
   const searchTerm = formData.get("search") as string;
 
   if (!searchTerm) {
-    return data({ error: "Search term is required" }, { status: 400 });
+    throw data({ error: "Search term is required" }, { status: 400 });
   }
 
   const searchResults = await db
