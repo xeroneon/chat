@@ -2,7 +2,6 @@ import { eq, inArray, sql } from "drizzle-orm";
 import { ActionFunction, data, redirect } from "@remix-run/node";
 import { db } from "~/db/db";
 import { groupMembers, groups, users } from "~/db/schema";
-import { getAuth } from "@clerk/remix/ssr.server";
 
 async function createGroupAndMembers(
   groupName: string,
@@ -39,11 +38,8 @@ async function createGroupAndMembers(
 
 export const action: ActionFunction = async (args) => {
   const { request } = args;
-  const { userId } = await getAuth(args);
-  const result = await db
-    .select()
-    .from(users)
-    .where(eq(users.internalUserId, userId!));
+  const userId = 10;
+  const result = await db.select().from(users).where(eq(users.userId, userId!));
 
   if (result.length <= 0) {
     return data(

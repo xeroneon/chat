@@ -5,19 +5,14 @@ import {
   Scripts,
   ScrollRestoration,
   useLoaderData,
+  useRouteLoaderData,
 } from "@remix-run/react";
-import type { LinksFunction, LoaderFunction } from "@remix-run/node";
+import type { LinksFunction, LoaderFunctionArgs } from "@remix-run/node";
 
 import "./tailwind.css";
-import { rootAuthLoader } from "@clerk/remix/ssr.server";
-import { createClerkClient } from "@clerk/remix/api.server";
-import { ClerkApp } from "@clerk/remix";
 import { themeSessionResolver } from "./sessions.server";
 import { ThemeProvider, useTheme } from "remix-themes";
 import clsx from "clsx";
-import { db } from "./db/db";
-import { users } from "./db/schema";
-import { eq } from "drizzle-orm";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const queryClient = new QueryClient();
@@ -39,50 +34,12 @@ export const links: LinksFunction = () => [
   },
 ];
 
-async function createUser(internalUserId: string) {
-  const clerkClient = createClerkClient({
-    secretKey: process.env.CLERK_SECRET_KEY,
-  });
-  const user = await clerkClient.users.getUser(internalUserId);
-  try {
-    const newUser = await db
-      .insert(users)
-      .values({
-        username: user.username as string,
-        email: user.primaryEmailAddress?.emailAddress as string,
-        imageUrl: user.imageUrl,
-        internalUserId,
-      })
-      .returning({ userId: users.userId, username: users.username });
-
-    return newUser[0];
-  } catch (error) {
-    console.error("Failed to create user:", error);
-    throw error;
-  }
-}
-
-export const loader: LoaderFunction = (args) => {
-  return rootAuthLoader(args, async ({ request }) => {
-    const { getTheme } = await themeSessionResolver(request);
-    const { sessionId, userId, getToken } = request.auth;
-    if (userId) {
-      const result = await db
-        .select()
-        .from(users)
-        .where(eq(users.internalUserId, userId));
-
-      if (result.length <= 0) {
-        createUser(userId);
-      }
-    }
-    // fetch data
-    return { theme: getTheme() };
-  });
+export const loader = async ({ request }: LoaderFunctionArgs) => {
+  const { getTheme } = await themeSessionResolver(request);
+  return { theme: getTheme() };
 };
 
 export function App() {
-  const data = useLoaderData<typeof loader>();
   const [theme] = useTheme();
   return (
     <html lang="en" className={clsx(theme)}>
@@ -105,15 +62,13 @@ export function App() {
   );
 }
 
-export function AppWithProviders() {
-  const data = useLoaderData<typeof loader>();
+export default function AppWithProviders() {
+  const data = useRouteLoaderData<typeof loader>("root");
   return (
-    <ThemeProvider specifiedTheme={data.theme} themeAction="/action/set-theme">
+    <ThemeProvider specifiedTheme={data!.theme} themeAction="/action/set-theme">
       <QueryClientProvider client={queryClient}>
         <App />
       </QueryClientProvider>
     </ThemeProvider>
   );
 }
-
-export default ClerkApp(AppWithProviders);

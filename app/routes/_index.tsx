@@ -1,5 +1,3 @@
-import { UserButton } from "@clerk/remix";
-import { getAuth } from "@clerk/remix/ssr.server";
 import {
   LoaderFunctionArgs,
   redirect,
@@ -22,7 +20,7 @@ export const meta: MetaFunction = () => {
 };
 
 export const loader = async (args: LoaderFunctionArgs) => {
-  const { userId } = await getAuth(args);
+  const userId = "10";
 
   if (!userId) {
     return redirect("/sign-in");
@@ -42,7 +40,6 @@ export default function Index() {
     <div className="min-h-screen flex flex-col items-center relative">
       <div className="flex justify-end p-4 w-full">
         <ModeToggle />
-        <UserButton />
       </div>
       <h1 className="text-5xl font-instrument font-bold">Chat</h1>
       <div className="w-full">

@@ -1,4 +1,4 @@
-import { sql } from "drizzle-orm";
+import { InferInsertModel, InferModel, sql } from "drizzle-orm";
 import {
   pgTable,
   serial,
@@ -29,13 +29,14 @@ export const FriendRequestStatus = pgEnum("friend_request_status", [
 // Users table
 export const users = pgTable("users", {
   userId: serial("user_id").primaryKey(),
-  internalUserId: varchar("internal_user_id").unique().notNull(),
   username: varchar("username", { length: 50 }).unique().notNull(),
   email: varchar("email", { length: 100 }).unique().notNull(),
+  passwordHash: text("password_hash").notNull(),
   imageUrl: varchar("image_url", { length: 2048 }),
   createdAt: timestamp("created_at").defaultNow(),
   lastLogin: timestamp("last_login"),
 });
+export type User = InferInsertModel<typeof users>;
 
 // New table for friend requests
 export const friendRequests = pgTable("friend_requests", {

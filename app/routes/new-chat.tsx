@@ -16,7 +16,6 @@ import {
 } from "@remix-run/react";
 import { useQuery } from "@tanstack/react-query";
 import UserListItem from "~/components/user-list-item";
-import { getAuth } from "@clerk/remix/ssr.server";
 import { friendRequestWithUsers } from "~/db/queries/friend-requests";
 import FriendRequestListItem from "~/components/friend-request-list-item";
 import { getUserFriendsList } from "~/db/queries/friendships";
@@ -25,7 +24,7 @@ import TitleSeparator from "~/components/title-separator";
 type User = InferSelectModel<typeof users>;
 
 export const loader = async (args: LoaderFunctionArgs) => {
-  const { userId: clerkUserId } = await getAuth(args);
+  const clerkUserId = 10;
 
   if (!clerkUserId) {
     return {};
@@ -34,7 +33,7 @@ export const loader = async (args: LoaderFunctionArgs) => {
   const user = await db
     .select()
     .from(users)
-    .where(eq(users.internalUserId, clerkUserId));
+    .where(eq(users.userId, clerkUserId));
 
   const userId = user[0].userId;
 

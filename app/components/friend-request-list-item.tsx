@@ -1,19 +1,8 @@
-import { InferSelectModel, eq } from "drizzle-orm";
-import React from "react";
-import { friendRequests, users } from "~/db/schema";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Button } from "./ui/button";
-import { PiPlusCircleDuotone as Add } from "react-icons/pi";
 import { useFetcher } from "@remix-run/react";
 import { action } from "../routes/action.create-friend-request";
-import { useUser } from "@clerk/remix";
-import { db } from "~/db/db";
-import {
-  friendRequestWithUsers,
-  FriendRequestWithUsers,
-} from "~/db/queries/friend-requests";
-
-type FriendRequest = InferSelectModel<typeof friendRequests>;
+import { FriendRequestWithUsers } from "~/db/queries/friend-requests";
 
 type Props = {
   friendRequest: FriendRequestWithUsers;
@@ -21,7 +10,6 @@ type Props = {
 
 export default function FriendRequestListItem({ friendRequest }: Props) {
   const { sender, requestId } = friendRequest;
-  const currentUser = useUser();
   const fetcher = useFetcher<typeof action>();
 
   const handleClick = () => {

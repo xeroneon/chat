@@ -2,15 +2,11 @@ import { InferSelectModel, eq, and } from "drizzle-orm";
 import { ActionFunction, data } from "@remix-run/node";
 import { db } from "~/db/db";
 import { friendRequests, users } from "~/db/schema";
-import { getAuth } from "@clerk/remix/ssr.server";
 
 export const action: ActionFunction = async (args) => {
+  const userId = 10;
   const { request } = args;
-  const { userId } = await getAuth(args);
-  const result = await db
-    .select()
-    .from(users)
-    .where(eq(users.internalUserId, userId!));
+  const result = await db.select().from(users).where(eq(users.userId, userId!));
 
   if (result.length <= 0) {
     return data(

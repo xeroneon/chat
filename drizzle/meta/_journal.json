@@ -36,6 +36,20 @@
       "when": 1736389268754,
       "tag": "0004_fantastic_komodo",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1736488766361,
+      "tag": "0005_magical_baron_zemo",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1736488905269,
+      "tag": "0006_careless_odin",
+      "breakpoints": true
     }
   ]
 }

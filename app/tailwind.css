@@ -11,10 +11,6 @@ body {
   }
 }
 
-div[data-clerk-component="signIn"] {
-  border: solid 10px black !important;
-}
-
 @layer base {
   :root {
     --background: 0 0% 100%;

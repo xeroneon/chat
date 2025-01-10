@@ -3,24 +3,18 @@ import { Link, useFetcher, useLoaderData } from "@remix-run/react";
 import { getCurrentGroupChatWithMessages } from "~/db/queries/chat";
 import { ChatInput } from "~/components/chat-input";
 import { createMessage } from "~/db/queries/messages";
-import { getInternalUser } from "~/db/queries/users";
-import { getAuth } from "@clerk/remix/ssr.server";
 import Bubble from "~/components/bubble";
 
 export const loader = async (args: LoaderFunctionArgs) => {
-  const { userId } = await getAuth(args);
   const { chatId } = args.params;
 
   if (!chatId) {
     throw data({ error: "No chatId provided" }, { status: 400 });
   }
 
-  if (!userId) {
-    throw data({ error: "No chatId provided" }, { status: 400 });
-  }
-
   const chatData = await getCurrentGroupChatWithMessages(parseInt(chatId, 10));
-  const userData = await getInternalUser(userId);
+  //const userData = await getInternalUser(userId);
+  //need to get userId here somehow
 
   return { chatData, userData: userData[0] };
 };
