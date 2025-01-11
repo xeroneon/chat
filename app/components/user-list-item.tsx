@@ -2,7 +2,10 @@ import { InferSelectModel, eq } from "drizzle-orm";
 import { users } from "~/db/schema";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Button } from "./ui/button";
-import { PiPlusCircleDuotone as Add } from "react-icons/pi";
+import {
+  PiPlusCircleDuotone as Add,
+  PiUserCircleDuotone,
+} from "react-icons/pi";
 import { useFetcher } from "@remix-run/react";
 import { action } from "../routes/action.create-friend-request";
 
@@ -38,7 +41,9 @@ export default function UserListItem({ user }: Props) {
     <div onClick={handleComponentClick} className="flex items-center py-4 mt-2">
       <Avatar className="mr-4">
         {user?.imageUrl && <AvatarImage src={user.imageUrl} />}
-        <AvatarFallback>{user.username}</AvatarFallback>
+        <AvatarFallback>
+          <PiUserCircleDuotone size={45} />
+        </AvatarFallback>
       </Avatar>
       <h1 className="font-bold text-lg flex-grow">{user.username}</h1>
       <Button

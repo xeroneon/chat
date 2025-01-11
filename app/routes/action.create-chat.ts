@@ -2,6 +2,7 @@ import { eq, inArray, sql } from "drizzle-orm";
 import { ActionFunction, data, redirect } from "@remix-run/node";
 import { db } from "~/db/db";
 import { groupMembers, groups, users } from "~/db/schema";
+import { getCurrentUser } from "~/db/queries/users";
 
 async function createGroupAndMembers(
   groupName: string,
@@ -38,17 +39,7 @@ async function createGroupAndMembers(
 
 export const action: ActionFunction = async (args) => {
   const { request } = args;
-  const userId = 10;
-  const result = await db.select().from(users).where(eq(users.userId, userId!));
-
-  if (result.length <= 0) {
-    return data(
-      { error: "No current user id available, please log in" },
-      { status: 400 }
-    );
-  }
-
-  const currentUserId = result[0].userId;
+  const { userId } = await getCurrentUser(args);
 
   const formData = await request.formData();
   const userIds = formData.getAll("userIds") as string[];
@@ -65,7 +56,7 @@ export const action: ActionFunction = async (args) => {
     .where(
       inArray(
         groupMembers.userId,
-        [...userIds, currentUserId.toString()]
+        [...userIds, userId.toString()]
           .map((id) => parseInt(id, 10))
           .filter(Boolean)
       )
@@ -81,8 +72,8 @@ export const action: ActionFunction = async (args) => {
   const groupId = await createGroupAndMembers(
     "test name",
     "test desc",
-    currentUserId,
-    [currentUserId, ...userIds.map((id) => parseInt(id, 10))]
+    userId,
+    [userId, ...userIds.map((id) => parseInt(id, 10))]
   );
   return redirect(`/chat/${groupId}`);
 };

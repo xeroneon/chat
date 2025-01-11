@@ -2,10 +2,11 @@ import { eq } from "drizzle-orm";
 import { ActionFunction, data } from "@remix-run/node";
 import { db } from "~/db/db";
 import { friendRequests, friendships, users } from "~/db/schema";
+import { getCurrentUser } from "~/db/queries/users";
 
 export const action: ActionFunction = async (args) => {
   const { request } = args;
-  const userId = 10;
+  const { userId } = await getCurrentUser(args);
   const result = await db.select().from(users).where(eq(users.userId, userId!));
 
   if (result.length <= 0) {

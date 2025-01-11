@@ -17,7 +17,7 @@ export function SignUpForm({
 }: React.ComponentPropsWithoutRef<"div">) {
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <Card>
+      <Card className=" dark:border-white border-black border-[3px]">
         <CardHeader>
           <CardTitle className="text-2xl">SignUp</CardTitle>
           <CardDescription>
@@ -65,7 +65,7 @@ export function SignUpForm({
             </div>
             <div className="mt-4 text-center text-sm">
               Already have an account?{" "}
-              <Link to="" className="underline underline-offset-4">
+              <Link to="/sign-in" className="underline underline-offset-4">
                 Sign In
               </Link>
             </div>

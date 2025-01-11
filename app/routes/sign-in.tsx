@@ -28,12 +28,11 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 export default function Signin() {
   const { Form } = useFetcher();
   return (
-    <Form
-      method="post"
-      className="flex flex-col items-center justify-around h-screen"
-    >
-      <h1 className="text-5xl font-instrument font-bold">Chat</h1>
-      <div className="w-fit dark:border-white border-black border-[3px] rounded-[14px]">
+    <Form method="post" className="flex flex-col items-center h-screen">
+      <h1 className="flex items-center justify-center text-5xl h-40 text-center font-instrument font-bold">
+        Chat
+      </h1>
+      <div className="w-fit">
         <LoginForm />
       </div>
     </Form>

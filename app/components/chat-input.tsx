@@ -8,11 +8,7 @@ interface SearchInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   initialValue?: string;
 }
 
-export function ChatInput({
-  className,
-  initialValue,
-  ...props
-}: SearchInputProps) {
+export function ChatInput({ className, ...props }: SearchInputProps) {
   return (
     <div
       className={cn(
@@ -25,7 +21,6 @@ export function ChatInput({
         name="message"
         placeholder="Message..."
         className="pr-10 rounded-full border-[3px] border-black dark:border-white"
-        defaultValue={initialValue}
         {...props}
       />
       <Button

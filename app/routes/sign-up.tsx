@@ -17,17 +17,22 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const email = formData.get("email") as string;
   const username = formData.get("username") as string;
   const password = formData.get("password");
+
   if (!password) {
     throw {};
   }
+
   const existingUser = await getUser(email);
-  if (existingUser) {
+
+  if (existingUser.length) {
     return data(
-      { errors: { general: "An error occurred while signing up" } },
+      { errors: { general: "This user already exists" } },
       { status: 500 }
     );
   }
+
   const passwordHash = await bcrypt.hash(password as string, 10);
+
   const user = await createUser({
     email,
     passwordHash,
@@ -48,9 +53,11 @@ export default function Signup() {
   const actionData = useActionData<typeof action>();
   console.log({ actionData });
   return (
-    <div className="flex flex-col items-center justify-around h-screen">
-      <h1 className="text-5xl font-instrument font-bold">Chat</h1>
-      <div className="w-fit dark:border-white border-black border-[3px] rounded-[10px]">
+    <div className="flex flex-col items-center h-screen">
+      <h1 className="flex items-center justify-center h-40 text-5xl font-instrument font-bold">
+        Chat
+      </h1>
+      <div className="w-fit">
         <SignUpForm />
       </div>
     </div>

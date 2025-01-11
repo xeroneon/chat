@@ -54,7 +54,11 @@ export default function Index() {
       <h1 className="text-5xl font-instrument font-bold">Chat</h1>
       <div className="w-full">
         {chats.map((chat) => (
-          <ChatListItem chat={chat} currentUserId={user.userId} />
+          <ChatListItem
+            key={chat.groupId}
+            chat={chat}
+            currentUserId={user.userId}
+          />
         ))}
       </div>
       <Button

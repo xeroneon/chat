@@ -4,19 +4,19 @@ import { getCurrentGroupChatWithMessages } from "~/db/queries/chat";
 import { ChatInput } from "~/components/chat-input";
 import { createMessage } from "~/db/queries/messages";
 import Bubble from "~/components/bubble";
+import { getCurrentUser } from "~/db/queries/users";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const { chatId } = args.params;
+  const user = await getCurrentUser(args);
 
   if (!chatId) {
     throw data({ error: "No chatId provided" }, { status: 400 });
   }
 
   const chatData = await getCurrentGroupChatWithMessages(parseInt(chatId, 10));
-  //const userData = await getInternalUser(userId);
-  //need to get userId here somehow
 
-  return { chatData, userData: {} };
+  return { chatData, user };
 };
 
 export const action = async ({ request, params }: ActionFunctionArgs) => {
@@ -39,7 +39,7 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
 };
 
 export default function Chat() {
-  const { chatData, userData } = useLoaderData<typeof loader>();
+  const { chatData, user } = useLoaderData<typeof loader>();
   const messages = [...chatData.messages].reverse();
   const { Form } = useFetcher();
 
@@ -62,7 +62,7 @@ export default function Chat() {
         ))}
       </div>
       <ChatInput />
-      <input name="userId" defaultValue={userData.userId} className="hidden" />
+      <input name="userId" defaultValue={user.userId} className="hidden" />
     </Form>
   );
 }

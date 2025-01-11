@@ -2,9 +2,10 @@ import { InferSelectModel, eq, and } from "drizzle-orm";
 import { ActionFunction, data } from "@remix-run/node";
 import { db } from "~/db/db";
 import { friendRequests, users } from "~/db/schema";
+import { getCurrentUser } from "~/db/queries/users";
 
 export const action: ActionFunction = async (args) => {
-  const userId = 10;
+  const { userId } = await getCurrentUser(args);
   const { request } = args;
   const result = await db.select().from(users).where(eq(users.userId, userId!));
 

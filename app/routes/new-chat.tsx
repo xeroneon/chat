@@ -20,27 +20,17 @@ import { friendRequestWithUsers } from "~/db/queries/friend-requests";
 import FriendRequestListItem from "~/components/friend-request-list-item";
 import { getUserFriendsList } from "~/db/queries/friendships";
 import TitleSeparator from "~/components/title-separator";
+import { getCurrentUser } from "~/db/queries/users";
 
 type User = InferSelectModel<typeof users>;
 
 export const loader = async (args: LoaderFunctionArgs) => {
-  const clerkUserId = 10;
-
-  if (!clerkUserId) {
-    return {};
-  }
-
-  const user = await db
-    .select()
-    .from(users)
-    .where(eq(users.userId, clerkUserId));
-
-  const userId = user[0].userId;
+  const { userId } = await getCurrentUser(args);
 
   const requests = await friendRequestWithUsers
     .where(
       and(
-        eq(friendRequests.receiverId, user[0].userId),
+        eq(friendRequests.receiverId, userId),
         eq(friendRequests.status, "pending")
       )
     )
