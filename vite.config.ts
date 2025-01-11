@@ -21,4 +21,23 @@ export default defineConfig({
     }),
     tsconfigPaths(),
   ],
+  build: {
+    rollupOptions: {
+      external: [
+        "bcrypt",
+        "nock",
+        "aws-sdk",
+        "mock-aws-s3",
+        "@mapbox/node-pre-gyp",
+        /node-pre-gyp/,
+        /\.node$/,
+      ],
+    },
+  },
+  optimizeDeps: {
+    exclude: ["bcrypt", "@mapbox/node-pre-gyp"],
+  },
+  ssr: {
+    external: ["bcrypt", "@mapbox/node-pre-gyp"],
+  },
 });

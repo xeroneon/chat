@@ -1,4 +1,4 @@
-import { sql } from "drizzle-orm";
+import { InferInsertModel, InferModel, sql } from "drizzle-orm";
 import {
   pgTable,
   serial,
@@ -8,6 +8,7 @@ import {
   integer,
   pgEnum,
   primaryKey,
+  boolean,
 } from "drizzle-orm/pg-core";
 
 // Define an enum for media types to ensure consistency
@@ -18,23 +19,68 @@ export const MediaType = pgEnum("media_type", [
   "document",
 ]);
 
+// Define an enum for friend request status
+export const FriendRequestStatus = pgEnum("friend_request_status", [
+  "pending",
+  "accepted",
+  "rejected",
+]);
+
 // Users table
 export const users = pgTable("users", {
   userId: serial("user_id").primaryKey(),
-  clerkUserId: varchar("internal_user_id").unique().notNull(),
   username: varchar("username", { length: 50 }).unique().notNull(),
   email: varchar("email", { length: 100 }).unique().notNull(),
+  passwordHash: text("password_hash").notNull(),
+  imageUrl: varchar("image_url", { length: 2048 }),
   createdAt: timestamp("created_at").defaultNow(),
   lastLogin: timestamp("last_login"),
 });
+export type User = InferInsertModel<typeof users>;
+
+// New table for friend requests
+export const friendRequests = pgTable("friend_requests", {
+  requestId: serial("request_id").primaryKey(),
+  senderId: integer("sender_id")
+    .notNull()
+    .references(() => users.userId),
+  receiverId: integer("receiver_id")
+    .notNull()
+    .references(() => users.userId),
+  status: FriendRequestStatus("status").notNull().default("pending"),
+  sentAt: timestamp("sent_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+  // Optional message with the friend request
+  message: text("message"),
+});
+
+// New table for friends (established friendships)
+export const friendships = pgTable(
+  "friendships",
+  {
+    userId1: integer("user_id_1")
+      .notNull()
+      .references(() => users.userId),
+    userId2: integer("user_id_2")
+      .notNull()
+      .references(() => users.userId),
+    becameFriendsAt: timestamp("became_friends_at").defaultNow(),
+    // Optional: Add a boolean for blocking/muting
+    isBlocked: boolean("is_blocked").default(false),
+  },
+  (t) => [
+    // Ensure unique friendships and prevent duplicate entries
+    primaryKey({ columns: [t.userId1, t.userId2] }),
+  ]
+);
 
 // Groups table
 export const groups = pgTable("groups", {
   groupId: serial("group_id").primaryKey(),
-  groupName: varchar("group_name", { length: 100 }).notNull(),
+  groupName: varchar("group_name", { length: 100 }),
   description: text("description"),
   createdBy: integer("created_by").references(() => users.userId),
-  createdAt: timestamp("created_at").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
 // Group members table

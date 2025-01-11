@@ -11,10 +11,6 @@ body {
   }
 }
 
-div[data-clerk-component="signIn"] {
-  border: solid 10px black !important;
-}
-
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -78,4 +74,17 @@ div[data-clerk-component="signIn"] {
   body {
     @apply bg-background text-foreground;
   }
+}
+
+.chat-container {
+  min-height: 100dvh;
+  min-height: -webkit-fill-available; /* for iOS */
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.input-container {
+  position: sticky;
+  bottom: 20px;
+  /* Add padding for devices with home indicators */
+  padding-bottom: env(safe-area-inset-bottom);
 }
