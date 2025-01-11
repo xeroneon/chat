@@ -19,7 +19,7 @@ export async function createMessage({
   thumbnailPath,
 }: CreateMessageParams): Promise<void> {
   try {
-    await db.insert(messages).values({
+    const messageResult = await db.insert(messages).values({
       groupId,
       userId,
       content: content || null,
@@ -29,6 +29,8 @@ export async function createMessage({
     });
 
     console.log("Message created successfully");
+
+    return messageResult[0];
   } catch (error) {
     console.error("Failed to create message:", error);
     throw error; // or handle the error as needed
