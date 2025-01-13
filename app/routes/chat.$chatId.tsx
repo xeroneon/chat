@@ -49,7 +49,6 @@ export default function Chat() {
   const [allMessages, setAllMessages] = useState(messages);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
-  const isFirstRender = useRef(true);
 
   useEffect(() => {
     const eventSource = new EventSource(`/chat/${chatData.groupId}/events`);

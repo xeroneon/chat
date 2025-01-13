@@ -11,6 +11,7 @@ import { Form, useLoaderData, useNavigate } from "@remix-run/react";
 import { getChats } from "~/db/queries/chat";
 import ChatListItem from "~/components/chat-list-item";
 import { sessionStorage } from "~/services/session.server";
+import UserAccountDropdown from "~/components/user-account-dropdown";
 
 export const meta: MetaFunction = () => {
   return [
@@ -46,10 +47,7 @@ export default function Index() {
   return (
     <div className="min-h-screen flex flex-col items-center relative">
       <div className="flex justify-end p-4 w-full">
-        <ModeToggle />
-        <Form method="post">
-          <Button type="submit">Log Out</Button>
-        </Form>
+        <UserAccountDropdown user={user} />
       </div>
       <h1 className="text-5xl font-instrument font-bold">Chat</h1>
       <div className="w-full">
