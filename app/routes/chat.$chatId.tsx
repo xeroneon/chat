@@ -1,44 +1,18 @@
 import { ActionFunctionArgs, data, LoaderFunctionArgs } from "@remix-run/node";
-import { Link, useFetcher, useLoaderData } from "@remix-run/react";
+import { Link, useFetcher, useLoaderData, useLocation } from "@remix-run/react";
 import { getCurrentGroupChatWithMessages } from "~/db/queries/chat";
 import { ChatInput } from "~/components/chat-input";
 import { createMessage } from "~/db/queries/messages";
 import Bubble from "~/components/bubble";
 import { getCurrentUser } from "~/db/queries/users";
-import { eventStream } from "~/utils/eventStream.server";
-import Redis from "ioredis";
 import { redis } from "~/services/redis.server";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const { chatId } = args.params;
-  const { request } = args;
   const user = await getCurrentUser(args);
 
-  if (!chatId) {
-    throw data({ error: "No chatId provided" }, { status: 400 });
-  }
-
-  if (new Headers(request.headers).get("Accept") === "text/event-stream") {
-    console.log("creating event stream");
-    return eventStream(request, (send) => {
-      const listener = (message: string) => {
-        send({ event: "message", data: message });
-      };
-      const channelName = `chat:${chatId}`;
-
-      const subscriber = new Redis(process.env.REDIS_URL!);
-      subscriber.subscribe(channelName);
-      subscriber.on("message", (channel, message) => listener(message));
-
-      console.log("returning event stream");
-      return () => {
-        subscriber.quit();
-      };
-    });
-  }
-
-  const chatData = await getCurrentGroupChatWithMessages(parseInt(chatId, 10));
+  const chatData = await getCurrentGroupChatWithMessages(parseInt(chatId!, 10));
 
   return { chatData, user };
 };
@@ -58,10 +32,10 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
     userId: parseInt(userId, 10),
     content: message,
   });
+
   const channelName = `chat:${chatId}`;
 
   await redis.publish(channelName, JSON.stringify(messageResult));
-  console.log("after publish");
 
   return { messageResult };
 };
@@ -71,18 +45,26 @@ export default function Chat() {
   const messages = [...chatData.messages].reverse();
   const { Form } = useFetcher();
   const [allMessages, setAllMessages] = useState(messages);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const eventSource = new EventSource(`/chat/${chatData.chatId}`);
+    const eventSource = new EventSource(`/chat/${chatData.groupId}/events`);
 
-    eventSource.addEventListener("message", (event) => {
+    eventSource.onmessage = (event) => {
       const message = JSON.parse(event.data);
-      console.log("in event listener", { message });
-      setAllMessages((prev) => [...prev, message]);
-    });
+      setAllMessages((prev) => [...prev, JSON.parse(message?.data)]);
+    };
 
     return () => eventSource.close();
-  }, []);
+  }, [chatData?.groupId]);
+
+  useEffect(() => {
+    if (messagesContainerRef && messagesContainerRef.current) {
+      messagesContainerRef.current.lastElementChild?.scrollIntoView({
+        behavior: "smooth",
+      });
+    }
+  }, [allMessages]);
 
   return (
     <Form
@@ -92,8 +74,8 @@ export default function Chat() {
       <Link to="/" className="mx-auto mb-4">
         <h1 className="text-5xl font-instrument font-bold">Chat</h1>
       </Link>
-      <div className="grow overflow-y-auto w-full">
-        {messages.map((message) => (
+      <div ref={messagesContainerRef} className="grow overflow-y-auto w-full">
+        {allMessages.map((message) => (
           <Bubble
             key={message.messageId}
             userImage={message?.senderData?.imageUrl}

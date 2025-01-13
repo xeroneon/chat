@@ -17,22 +17,22 @@ export async function createMessage({
   mediaType,
   mediaPath,
   thumbnailPath,
-}: CreateMessageParams): Promise<void> {
+}: CreateMessageParams) {
   try {
-    const messageResult = await db.insert(messages).values({
-      groupId,
-      userId,
-      content: content || null,
-      mediaType: mediaType ? (mediaType as any) : null,
-      mediaPath: mediaPath || null,
-      thumbnailPath: thumbnailPath || null,
-    });
-
-    console.log("Message created successfully");
+    const messageResult = await db
+      .insert(messages)
+      .values({
+        groupId,
+        userId,
+        content: content || null,
+        mediaType: mediaType ? (mediaType as any) : null,
+        mediaPath: mediaPath || null,
+        thumbnailPath: thumbnailPath || null,
+      })
+      .returning();
 
     return messageResult[0];
   } catch (error) {
-    console.error("Failed to create message:", error);
     throw error; // or handle the error as needed
   }
 }
