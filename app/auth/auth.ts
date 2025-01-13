@@ -5,7 +5,8 @@ import bcrypt from "bcrypt";
 export const authenticator = new Authenticator<User>();
 
 import { FormStrategy } from "remix-auth-form";
-import { getUser } from "~/db/queries/users";
+import { GitHubStrategy } from "remix-auth-github";
+import { createUser, getUser } from "~/db/queries/users";
 import { redirect } from "@remix-run/node";
 
 const verifyLogin = async (email: string, password: string) => {
@@ -34,4 +35,46 @@ authenticator.use(
     return user[0];
   }),
   "form"
+);
+
+authenticator.use(
+  new GitHubStrategy(
+    {
+      clientId: process.env.GITHUB_CLIENT_ID as string,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET as string,
+      redirectURI: new URL("http://localhost:5173/auth/github").toString(),
+      scopes: ["user:email"], // Add any additional scopes you need
+    },
+    async ({ request, tokens }) => {
+      const data: any = tokens.data;
+      const response = await fetch("https://api.github.com/user", {
+        headers: {
+          Authorization: `Bearer ${data?.access_token}`,
+        },
+      });
+      const githubUser = await response.json();
+
+      // Fetch user's email (it might not be public)
+      const emailResponse = await fetch("https://api.github.com/user/emails", {
+        headers: {
+          Authorization: `Bearer ${data?.access_token}`,
+        },
+      });
+      const emails = await emailResponse.json();
+      const primaryEmail = emails.find((email: any) => email.primary)?.email;
+
+      const user = await getUser(primaryEmail);
+
+      if (!user || user.length === 0) {
+        const newUser = await createUser({
+          username: githubUser.login,
+          email: primaryEmail,
+          imageUrl: githubUser.avatar_url,
+        });
+        return newUser;
+      }
+
+      return user[0];
+    }
+  )
 );

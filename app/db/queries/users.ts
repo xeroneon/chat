@@ -23,7 +23,7 @@ export async function getCurrentUser({ request }: LoaderFunctionArgs) {
 type CreateUserParams = {
   username: string;
   email: string;
-  passwordHash: string;
+  passwordHash?: string;
   imageUrl?: string;
 };
 
@@ -42,16 +42,10 @@ export async function createUser({
         imageUrl,
         passwordHash,
       })
-      .returning({
-        username: users.username,
-        email: users.email,
-        imageUrl: users.imageUrl,
-      });
+      .returning();
 
-    console.log("User created successfully");
     return userResult[0];
   } catch (error) {
-    console.error("Failed to create user:", error);
     throw error;
   }
 }

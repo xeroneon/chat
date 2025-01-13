@@ -13,9 +13,10 @@ type User = InferSelectModel<typeof users>;
 
 type Props = {
   user: User;
+  isFriend: boolean;
 };
 
-export default function UserListItem({ user }: Props) {
+export default function UserListItem({ user, isFriend = false }: Props) {
   const fetcher = useFetcher<typeof action>();
 
   const handleClick = () => {
@@ -46,14 +47,16 @@ export default function UserListItem({ user }: Props) {
         </AvatarFallback>
       </Avatar>
       <h1 className="font-bold text-lg flex-grow">{user.username}</h1>
-      <Button
-        type="button"
-        onClick={handleClick}
-        variant="ghost"
-        className="justify-self-end"
-      >
-        <Add size={30} />
-      </Button>
+      {!isFriend && (
+        <Button
+          type="button"
+          onClick={handleClick}
+          variant="ghost"
+          className="justify-self-end"
+        >
+          <Add size={30} />
+        </Button>
+      )}
     </div>
   );
 }

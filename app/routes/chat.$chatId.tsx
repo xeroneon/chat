@@ -66,14 +66,10 @@ export default function Chat() {
     if (!messagesContainerRef.current) return;
 
     if (isInitialLoad) {
-      console.log("initial");
-      // On initial load, instantly position at bottom without animation
       messagesContainerRef.current.scrollTop =
         messagesContainerRef.current.scrollHeight;
       setIsInitialLoad(false);
     } else {
-      console.log("not initial");
-      // For new messages, smooth scroll to bottom
       messagesContainerRef.current.lastElementChild?.scrollIntoView({
         behavior: "smooth",
       });

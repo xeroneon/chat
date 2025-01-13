@@ -1,4 +1,4 @@
-import { MetaFunction, useActionData } from "@remix-run/react";
+import { MetaFunction } from "@remix-run/react";
 import { ActionFunctionArgs, data, redirect } from "@remix-run/node";
 import { SignUpForm } from "~/components/signup-form";
 import { createUser, getUser } from "~/db/queries/users";
@@ -50,8 +50,6 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 };
 
 export default function Signup() {
-  const actionData = useActionData<typeof action>();
-  console.log({ actionData });
   return (
     <div className="flex flex-col items-center h-screen">
       <h1 className="flex items-center justify-center h-40 text-5xl font-instrument font-bold">

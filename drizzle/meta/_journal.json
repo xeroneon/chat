@@ -50,6 +50,13 @@
       "when": 1736488905269,
       "tag": "0006_careless_odin",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1736805916592,
+      "tag": "0007_first_shadowcat",
+      "breakpoints": true
     }
   ]
 }

@@ -6,8 +6,16 @@ import {
 } from "@remix-run/node";
 import { SearchInput } from "~/components/search-input";
 import { db } from "~/db/db";
-import { friendRequests, users } from "~/db/schema";
-import { and, eq, or, ilike, InferSelectModel } from "drizzle-orm";
+import { friendRequests, friendships, users } from "~/db/schema";
+import {
+  and,
+  eq,
+  or,
+  ilike,
+  InferSelectModel,
+  ne,
+  notInArray,
+} from "drizzle-orm";
 import {
   Link,
   useFetcher,
@@ -40,9 +48,11 @@ export const loader = async (args: LoaderFunctionArgs) => {
   return { requests, friends };
 };
 
-export const action = async ({ request }: ActionFunctionArgs) => {
+export const action = async (args: ActionFunctionArgs) => {
+  const { request } = args;
   const formData = await request.formData();
   const searchTerm = formData.get("search") as string;
+  const currentUser = await getCurrentUser(args);
 
   if (!searchTerm) {
     throw data({ error: "Search term is required" }, { status: 400 });
@@ -52,9 +62,25 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     .select()
     .from(users)
     .where(
-      or(
-        ilike(users.username, `%${searchTerm}%`),
-        ilike(users.email, `%${searchTerm}%`)
+      and(
+        or(
+          ilike(users.username, `%${searchTerm}%`),
+          ilike(users.email, `%${searchTerm}%`)
+        ),
+        ne(users.userId, currentUser.userId),
+        notInArray(
+          users.userId,
+          db
+            .select({ friendId: friendships.userId2 })
+            .from(friendships)
+            .where(eq(friendships.userId1, currentUser.userId))
+            .union(
+              db
+                .select({ friendId: friendships.userId1 })
+                .from(friendships)
+                .where(eq(friendships.userId2, currentUser.userId))
+            )
+        )
       )
     );
 
@@ -91,12 +117,15 @@ export default function NewChat() {
       ))}
 
       {usersData && <TitleSeparator text="Matching Users" />}
+      {usersData && usersData.length <= 0 && (
+        <p>No users found matching that search</p>
+      )}
       {usersData?.map((user) => (
-        <UserListItem key={user.userId} user={user} />
+        <UserListItem key={user.userId} user={user} isFriend={false} />
       ))}
       {friends && <TitleSeparator text="Friends" />}
       {friends?.map((user) => (
-        <UserListItem key={user.userId} user={user as any} />
+        <UserListItem key={user.userId} user={user as any} isFriend />
       ))}
     </div>
   );

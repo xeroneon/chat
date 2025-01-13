@@ -9,12 +9,13 @@ import {
 } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
-import { Form, Link } from "@remix-run/react";
+import { Form, Link, useFetcher } from "@remix-run/react";
 
 export function SignUpForm({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<"div">) {
+  const fetcher = useFetcher();
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card className=" dark:border-white border-black border-[3px]">
@@ -62,6 +63,11 @@ export function SignUpForm({
               <Button type="submit" className="w-full">
                 Sign Up
               </Button>
+              <fetcher.Form method="post" action="/auth/github">
+                <Button type="submit" className="w-full">
+                  Sign Up with github
+                </Button>
+              </fetcher.Form>
             </div>
             <div className="mt-4 text-center text-sm">
               Already have an account?{" "}

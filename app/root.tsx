@@ -63,7 +63,6 @@ export function App() {
 
 export default function AppWithProviders() {
   const data = useLoaderData<typeof loader>();
-  console.log({ data });
   return (
     <ThemeProvider specifiedTheme={data!.theme} themeAction="/action/set-theme">
       <QueryClientProvider client={queryClient}>

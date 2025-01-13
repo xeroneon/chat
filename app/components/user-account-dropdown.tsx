@@ -11,6 +11,8 @@ import { User } from "~/db/schema";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { PiUserCircleDuotone } from "react-icons/pi";
 import { ModeToggle } from "./mode-tottle";
+import { Form, useFetcher } from "@remix-run/react";
+import { Button } from "./ui/button";
 
 type Props = {
   user: User;
@@ -18,6 +20,7 @@ type Props = {
 
 export default function UserAccountDropdown({ user }: Props) {
   const { imageUrl } = user;
+  const fetcher = useFetcher();
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
@@ -28,13 +31,17 @@ export default function UserAccountDropdown({ user }: Props) {
           </AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
-      <DropdownMenuContent>
+      <DropdownMenuContent className="mr-4">
         <DropdownMenuLabel>My Account</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem>Profile</DropdownMenuItem>
         <DropdownMenuItem>Billing</DropdownMenuItem>
         <DropdownMenuItem>Team</DropdownMenuItem>
-        <DropdownMenuItem>Subscription</DropdownMenuItem>
+        <fetcher.Form method="post" action="/action/sign-out">
+          <DropdownMenuItem>
+            <Button type="submit">Log Out</Button>
+          </DropdownMenuItem>
+        </fetcher.Form>
         <DropdownMenuSeparator />
         <DropdownMenuItem>
           <ModeToggle />
