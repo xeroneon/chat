@@ -11,7 +11,6 @@ const sessionStorage = createCookieSessionStorage({
     httpOnly: true,
     sameSite: "lax",
     secrets: ["chat"],
-    // Set domain and secure only if in production
     ...(isProduction
       ? { domain: "your-production-domain.com", secure: true }
       : {}),

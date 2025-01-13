@@ -4,7 +4,7 @@
 
 html,
 body {
-  @apply bg-slate-200 dark:bg-slate-950;
+  @apply bg-background;
 
   @media (prefers-color-scheme: dark) {
     color-scheme: dark;
@@ -75,7 +75,6 @@ body {
     @apply bg-background text-foreground;
   }
 }
-
 .chat-container {
   min-height: 100dvh;
   min-height: -webkit-fill-available; /* for iOS */

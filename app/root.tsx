@@ -5,7 +5,6 @@ import {
   Scripts,
   ScrollRestoration,
   useLoaderData,
-  useRouteLoaderData,
 } from "@remix-run/react";
 import type { LinksFunction, LoaderFunctionArgs } from "@remix-run/node";
 
@@ -53,7 +52,7 @@ export function App() {
         <Meta />
         <Links />
       </head>
-      <body>
+      <body className="bg-background text-foreground">
         <Outlet />
         <ScrollRestoration />
         <Scripts />
@@ -63,7 +62,8 @@ export function App() {
 }
 
 export default function AppWithProviders() {
-  const data = useRouteLoaderData<typeof loader>("root");
+  const data = useLoaderData<typeof loader>();
+  console.log({ data });
   return (
     <ThemeProvider specifiedTheme={data!.theme} themeAction="/action/set-theme">
       <QueryClientProvider client={queryClient}>

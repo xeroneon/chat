@@ -13,7 +13,6 @@ export const meta: MetaFunction = () => {
   ];
 };
 export const action = async ({ request }: ActionFunctionArgs) => {
-  console.log("action hit");
   const user = await authenticator.authenticate("form", request);
 
   const session = await sessionStorage.getSession(

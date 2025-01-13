@@ -12,7 +12,7 @@ export function ChatInput({ className, ...props }: SearchInputProps) {
   return (
     <div
       className={cn(
-        "input-container w-[calc(100%-2rem)] mx-4 transition-all duration-300",
+        "input-container bg-background dark:bg-background min-h-fit w-[calc(100%-2rem)] mx-4 transition-all duration-300",
         className
       )}
     >

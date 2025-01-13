@@ -1,4 +1,5 @@
 import { createCookieSessionStorage } from "@remix-run/node";
+const isProduction = process.env.NODE_ENV === "production";
 
 export const sessionStorage = createCookieSessionStorage({
   cookie: {
@@ -8,5 +9,8 @@ export const sessionStorage = createCookieSessionStorage({
     httpOnly: true, // for security reasons, make this cookie http only
     secrets: ["s3cr3t"], // replace this with an actual secret from env
     secure: process.env.NODE_ENV === "production", // enable this in prod only
+    ...(isProduction
+      ? { domain: "your-production-domain.com", secure: true }
+      : {}),
   },
 });
