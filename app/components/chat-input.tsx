@@ -12,26 +12,28 @@ export function ChatInput({ className, ...props }: SearchInputProps) {
   return (
     <div
       className={cn(
-        "input-container bg-background dark:bg-background min-h-fit w-[calc(100%-2rem)] mx-4 transition-all duration-300",
+        "input-container min-h-fit w-[calc(100%-2rem)] mx-4 transition-all duration-300",
         className
       )}
     >
-      <Input
-        type="input"
-        name="message"
-        placeholder="Message..."
-        className="pr-10 rounded-full border-[3px] border-black dark:border-white"
-        {...props}
-      />
-      <Button
-        type="submit"
-        size="sm"
-        variant="ghost"
-        className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-      >
-        <PiPaperPlaneTiltDuotone size={20} />
-        <span className="sr-only">Search</span>
-      </Button>
+      <div className="bg-background p-2 rounded-full dark:bg-background">
+        <Input
+          type="input"
+          name="message"
+          placeholder="Message..."
+          className="pr-10 h-30 rounded-full border-[3px] border-black dark:border-white"
+          {...props}
+        />
+        <Button
+          type="submit"
+          size="sm"
+          variant="ghost"
+          className="absolute right-2 top-0 h-full px-3 py-2 hover:bg-transparent"
+        >
+          <PiPaperPlaneTiltDuotone size={30} />
+          <span className="sr-only">Search</span>
+        </Button>
+      </div>
     </div>
   );
 }

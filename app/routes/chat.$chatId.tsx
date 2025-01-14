@@ -79,16 +79,16 @@ export default function Chat() {
   return (
     <Form
       method="post"
-      className="flex flex-col items-center p-4 max-h-screen min-h-screen"
+      className="flex flex-col items-center max-h-screen min-h-screen"
     >
-      <div className="flex fixed top-0 shadow-lg h-[100px] mb-4 p-4 w-full z-50 items-center bg-slate-100 dark:bg-slate-900">
-        <Link to="/" className="mx-auto">
-          <h1 className="text-5xl font-instrument font-bold">Chat</h1>
+      <div className="flex fixed top-0 shadow-lg h-[70px] p-4 w-full z-50 items-center bg-slate-100 dark:bg-slate-900">
+        <Link to="/" className="">
+          <h1 className="text-2xl font-instrument font-bold">Chat</h1>
         </Link>
       </div>
       <div
         ref={messagesContainerRef}
-        className="grow mb-10 overflow-y-auto w-full mt-[100px]"
+        className="grow overflow-y-auto pb-4 w-full mt-[55px]"
       >
         {allMessages.map((message) => (
           <Bubble
