@@ -1,4 +1,4 @@
-import { ActionFunctionArgs, redirect } from "@remix-run/node";
+import { ActionFunctionArgs, redirect, ErrorResponse } from "@remix-run/node";
 import { MetaFunction, useFetcher, useLoaderData } from "@remix-run/react";
 import React from "react";
 import { useTheme } from "remix-themes";
@@ -13,16 +13,22 @@ export const meta: MetaFunction = () => {
   ];
 };
 export const action = async ({ request }: ActionFunctionArgs) => {
-  const user = await authenticator.authenticate("form", request);
+  try {
+    // Your existing sign-in logic here
+    const user = await authenticator.authenticate("form", request);
+    const session = await sessionStorage.getSession(
+      request.headers.get("cookie")
+    );
+    session.set("user", user);
 
-  const session = await sessionStorage.getSession(
-    request.headers.get("cookie")
-  );
-  session.set("user", user);
-
-  throw redirect("/", {
-    headers: { "Set-Cookie": await sessionStorage.commitSession(session) },
-  });
+    throw redirect("/", {
+      headers: { "Set-Cookie": await sessionStorage.commitSession(session) },
+    });
+  } catch (error) {
+    console.error("Sign-in error:", error);
+    // You can throw a more specific error here if needed
+    throw new Response("Sign-in failed", { status: 500 });
+  }
 };
 export default function Signin() {
   const { Form } = useFetcher();
