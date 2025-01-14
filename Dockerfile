@@ -41,7 +41,9 @@ FROM base
 # Copy built application
 COPY --from=build /app /app
 
+# Create a shell script to run migrations and start the app
+RUN echo '#!/bin/sh\nbun run migrate && bun run start' > /app/start.sh && chmod +x /app/start.sh
+
 # Start the server by default, this can be overwritten at runtime
 EXPOSE 3000
-CMD [ "bun", "run", "migrate" ]
-CMD [ "bun", "run", "start" ]
+CMD ["/app/start.sh"]
