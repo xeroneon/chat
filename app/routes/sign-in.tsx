@@ -19,6 +19,9 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     console.log("Request headers:", Object.fromEntries(request.headers));
     console.log("Request body used:", request.bodyUsed);
 
+    const formData = await request.formData();
+    console.log("Form data in action:", Object.fromEntries(formData));
+
     const user = await authenticator.authenticate("form", request);
     console.log({ user });
     const session = await sessionStorage.getSession(
