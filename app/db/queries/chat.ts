@@ -74,12 +74,20 @@ export async function getChats(userId: number) {
       email: users.email,
       imageUrl: users.imageUrl,
     })
-    .from(groups)
-    .leftJoin(groupMembers, eq(groups.groupId, groupMembers.groupId))
-    .leftJoin(users, eq(groupMembers.userId, users.userId))
-    .where(eq(groupMembers.userId, userId));
+    .from(groupMembers)
+    .innerJoin(groups, eq(groupMembers.groupId, groups.groupId))
+    .innerJoin(users, eq(groupMembers.userId, users.userId))
+    .where(
+      eq(
+        groupMembers.groupId,
+        db
+          .select({ groupId: groupMembers.groupId })
+          .from(groupMembers)
+          .where(eq(groupMembers.userId, userId))
+      )
+    );
 
-  // Group results by groupId in TypeScript since Drizzle doesn't support this out of the box
+  // Group results by groupId
   const groupedChats = chats.reduce(
     (acc, chat) => {
       const existingGroup = acc.find((g) => g.groupId === chat.groupId);
@@ -90,18 +98,16 @@ export async function getChats(userId: number) {
           description: chat.description,
           createdBy: chat.createdBy,
           createdAt: chat.createdAt,
-          members: chat.userId
-            ? [
-                {
-                  userId: chat.userId,
-                  username: chat.username!,
-                  email: chat.email!,
-                  imageUrl: chat.imageUrl!,
-                },
-              ]
-            : [],
+          members: [
+            {
+              userId: chat.userId,
+              username: chat.username!,
+              email: chat.email!,
+              imageUrl: chat.imageUrl!,
+            },
+          ],
         });
-      } else if (chat.userId) {
+      } else {
         existingGroup.members.push({
           userId: chat.userId,
           username: chat.username!,
