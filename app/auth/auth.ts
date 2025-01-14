@@ -9,7 +9,7 @@ import { GitHubStrategy } from "remix-auth-github";
 import { createUser, getUser } from "~/db/queries/users";
 import { redirect } from "@remix-run/node";
 
-const verifyLogin = async (email: string, password: string) => {
+export const verifyLogin = async (email: string, password: string) => {
   const user = await getUser(email);
   const match = await bcrypt.compare(password, user[0].passwordHash);
   if (!match) {
