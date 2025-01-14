@@ -13,19 +13,15 @@ export const meta: MetaFunction = () => {
   ];
 };
 export const action = async ({ request }: ActionFunctionArgs) => {
-  console.log("Request method:", request.method);
-  console.log("Request headers:", Object.fromEntries(request.headers));
-
-  const formData = await request.formData();
-  console.log("Form data:", Object.fromEntries(formData));
   try {
     const user = await authenticator.authenticate("form", request);
+    console.log({ user });
     const session = await sessionStorage.getSession(
       request.headers.get("cookie")
     );
     session.set("user", user);
 
-    throw redirect("/", {
+    return redirect("/", {
       headers: { "Set-Cookie": await sessionStorage.commitSession(session) },
     });
   } catch (error) {
