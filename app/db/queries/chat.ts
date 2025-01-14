@@ -1,6 +1,6 @@
 import { db } from "../db";
 import { groupMembers, groups, messages, users } from "../schema";
-import { eq, desc, sql, SQL, asc } from "drizzle-orm";
+import { eq, desc, sql, SQL, asc, inArray } from "drizzle-orm";
 
 export async function getCurrentGroupChatWithMessages(groupId: number) {
   const groupDetails = await db
@@ -73,19 +73,32 @@ export async function getChats(userId: number) {
       username: users.username,
       email: users.email,
       imageUrl: users.imageUrl,
+      messagePreview: sql<string>`
+        (SELECT content FROM ${messages}
+         WHERE ${messages.groupId} = ${groups.groupId}
+         ORDER BY ${messages.sentAt} DESC
+         LIMIT 1)
+      `.as("message_preview"),
+      lastMessageTime: sql<Date>`
+        (SELECT ${messages.sentAt} FROM ${messages}
+         WHERE ${messages.groupId} = ${groups.groupId}
+         ORDER BY ${messages.sentAt} DESC
+         LIMIT 1)
+      `.as("last_message_time"),
     })
     .from(groupMembers)
     .innerJoin(groups, eq(groupMembers.groupId, groups.groupId))
     .innerJoin(users, eq(groupMembers.userId, users.userId))
     .where(
-      eq(
+      inArray(
         groupMembers.groupId,
         db
           .select({ groupId: groupMembers.groupId })
           .from(groupMembers)
           .where(eq(groupMembers.userId, userId))
       )
-    );
+    )
+    .orderBy(desc(sql`last_message_time`));
 
   // Group results by groupId
   const groupedChats = chats.reduce(
@@ -98,6 +111,8 @@ export async function getChats(userId: number) {
           description: chat.description,
           createdBy: chat.createdBy,
           createdAt: chat.createdAt,
+          messagePreview: chat.messagePreview,
+          lastMessageTime: chat.lastMessageTime,
           members: [
             {
               userId: chat.userId,
@@ -123,6 +138,8 @@ export async function getChats(userId: number) {
       description: string | null;
       createdBy: number | null;
       createdAt: Date;
+      messagePreview: string | null;
+      lastMessageTime: Date | null;
       members: {
         userId: number;
         username: string;

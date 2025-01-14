@@ -35,10 +35,10 @@ export default function Index() {
   const navigate = useNavigate();
   return (
     <div className="min-h-screen flex flex-col items-center relative">
-      <div className="flex justify-end p-4 w-full">
+      <div className="flex justify-between items-center p-4 w-full">
+        <h1 className="text-2xl font-instrument font-bold select-none">Chat</h1>
         <UserAccountDropdown user={user} />
       </div>
-      <h1 className="text-5xl font-instrument font-bold select-none">Chat</h1>
       <div className="w-full">
         {chats.map((chat) => (
           <ChatListItem
