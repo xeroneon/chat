@@ -8,6 +8,7 @@ import {
 } from "react-icons/pi";
 import { useFetcher } from "@remix-run/react";
 import { action } from "../routes/action.create-friend-request";
+import { MouseEvent, KeyboardEvent } from "react";
 
 type User = InferSelectModel<typeof users>;
 
@@ -19,14 +20,15 @@ type Props = {
 export default function UserListItem({ user, isFriend = false }: Props) {
   const fetcher = useFetcher<typeof action>();
 
-  const handleClick = () => {
+  const handleClick = (e: MouseEvent) => {
+    e.stopPropagation();
     fetcher.submit(
       { receiverId: user.userId },
       { method: "post", action: "/action/create-friend-request" }
     );
   };
 
-  const handleComponentClick = () => {
+  const handleCreateChat = () => {
     const formData = new FormData();
     [user.userId].forEach((id) => {
       formData.append("userIds", id.toString());
@@ -38,8 +40,22 @@ export default function UserListItem({ user, isFriend = false }: Props) {
     });
   };
 
+  const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      handleCreateChat();
+    }
+  };
+
   return (
-    <div onClick={handleComponentClick} className="flex items-center py-4 mt-2">
+    <div
+      onClick={handleCreateChat}
+      onKeyDown={handleKeyDown}
+      className="flex items-center py-4 mt-2 cursor-pointer hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-300 rounded-lg transition-colors"
+      role="button"
+      tabIndex={0}
+      aria-label={`Create chat with ${user.username}`}
+    >
       <Avatar className="mr-4">
         {user?.imageUrl && <AvatarImage src={user.imageUrl} />}
         <AvatarFallback>

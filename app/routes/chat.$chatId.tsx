@@ -1,5 +1,5 @@
-import { ActionFunctionArgs, data, LoaderFunctionArgs } from "@remix-run/node";
-import { Link, useFetcher, useLoaderData, useLocation } from "@remix-run/react";
+import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
+import { Link, useFetcher, useLoaderData } from "@remix-run/react";
 import { getCurrentGroupChatWithMessages } from "~/db/queries/chat";
 import { ChatInput } from "~/components/chat-input";
 import { createMessage } from "~/db/queries/messages";
@@ -77,15 +77,18 @@ export default function Chat() {
   }, [allMessages, isInitialLoad]);
 
   return (
-    <Form method="post" className="flex flex-col items-center p-4 max-h-screen">
-      <div className="flex fixed top-0 shadow-lg mb-4 p-4 w-full z-50 item-center bg-slate-100 dark:bg-slate-900">
+    <Form
+      method="post"
+      className="flex flex-col items-center p-4 max-h-screen min-h-screen"
+    >
+      <div className="flex fixed top-0 shadow-lg h-[100px] mb-4 p-4 w-full z-50 items-center bg-slate-100 dark:bg-slate-900">
         <Link to="/" className="mx-auto">
           <h1 className="text-5xl font-instrument font-bold">Chat</h1>
         </Link>
       </div>
       <div
         ref={messagesContainerRef}
-        className="grow mb-10 overflow-y-auto w-full"
+        className="grow mb-10 overflow-y-auto w-full mt-[100px]"
       >
         {allMessages.map((message) => (
           <Bubble
@@ -95,6 +98,7 @@ export default function Chat() {
             {message.content}
           </Bubble>
         ))}
+        {allMessages.length <= 0 && <p>No messages have been sent</p>}
       </div>
       <ChatInput />
       <input name="userId" defaultValue={user.userId} className="hidden" />

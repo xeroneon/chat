@@ -76,7 +76,8 @@ export async function getChats(userId: number) {
     })
     .from(groups)
     .leftJoin(groupMembers, eq(groups.groupId, groupMembers.groupId))
-    .leftJoin(users, eq(groupMembers.userId, users.userId));
+    .leftJoin(users, eq(groupMembers.userId, users.userId))
+    .where(eq(groupMembers.userId, userId));
 
   // Group results by groupId in TypeScript since Drizzle doesn't support this out of the box
   const groupedChats = chats.reduce(

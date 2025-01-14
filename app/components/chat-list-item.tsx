@@ -10,6 +10,7 @@ type Props = {
 };
 
 export default function ChatListItem({ chat, currentUserId }: Props) {
+  console.log({ chat, currentUserId });
   const otherMembers = chat.members.filter(
     (member) => member.userId != currentUserId
   );
@@ -27,7 +28,7 @@ export default function ChatListItem({ chat, currentUserId }: Props) {
           );
         })}
         <h1 className="font-bold text-lg">
-          {chat.members.length > 2 ? chat.groupName : otherMembers[0].username}
+          {chat.members.length > 2 ? chat.groupName : otherMembers[0]?.username}
         </h1>
       </div>
     </Link>
