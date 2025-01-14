@@ -2,6 +2,7 @@ import { Link } from "@remix-run/react";
 import { getChats } from "~/db/queries/chat";
 import { ArrayElementType } from "~/types/type-helpers";
 import UserAvatar from "./user-avatar";
+import { RelativeTime } from "./relative-time";
 
 type Props = {
   chat: ArrayElementType<Awaited<ReturnType<typeof getChats>>>;
@@ -21,13 +22,18 @@ export default function ChatListItem({ chat, currentUserId }: Props) {
             <UserAvatar key={member.userId} user={member} className="mr-4" />
           );
         })}
-        <div className="flex flex-col">
+        <div className="flex flex-col grow">
           <h1 className="font-bold text-lg">
             {chat.members.length > 2
               ? chat.groupName
               : otherMembers[0]?.username}
           </h1>
           <p className="text-foreground/50">{chat.messagePreview}</p>
+        </div>
+        <div className="self-baseline">
+          {chat.lastMessageTime && (
+            <RelativeTime date={new Date(chat.lastMessageTime)} />
+          )}
         </div>
       </div>
     </Link>
