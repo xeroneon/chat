@@ -26,7 +26,6 @@ export default function ChatListItem({ chat, currentUserId }: Props) {
             >
               {member?.imageUrl && <AvatarImage src={member.imageUrl} />}
               <AvatarFallback>
-                <PiUserCircleDuotone size={45} />
                 <GravatarImage email={member.email} />
               </AvatarFallback>
             </Avatar>

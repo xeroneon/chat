@@ -13,6 +13,7 @@ import { PiUserCircleDuotone } from "react-icons/pi";
 import { ModeToggle } from "./mode-tottle";
 import { Form, useFetcher } from "@remix-run/react";
 import { Button } from "./ui/button";
+import GravatarImage from "./gravatar-image";
 
 type Props = {
   user: User;
@@ -27,7 +28,7 @@ export default function UserAccountDropdown({ user }: Props) {
         <Avatar className="mr-4">
           {imageUrl && <AvatarImage src={imageUrl} />}
           <AvatarFallback>
-            <PiUserCircleDuotone size={45} />
+            <GravatarImage email={user.email} />
           </AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>

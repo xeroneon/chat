@@ -88,12 +88,13 @@ export default function Chat() {
       </div>
       <div
         ref={messagesContainerRef}
-        className="grow overflow-y-auto pb-4 w-full mt-[55px]"
+        className="grow overflow-y-auto p-4 w-full mt-[55px]"
       >
         {allMessages.map((message) => (
           <Bubble
             key={message.messageId}
             userImage={message?.senderData?.imageUrl}
+            email={message?.senderData?.email}
           >
             {message.content}
           </Bubble>
