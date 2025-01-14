@@ -7,10 +7,8 @@ export const sessionStorage = createCookieSessionStorage({
     sameSite: "lax", // this helps with CSRF
     path: "/", // remember to add this so the cookie works in all routes
     httpOnly: true, // for security reasons, make this cookie http only
-    secrets: ["s3cr3t"], // replace this with an actual secret from env
+    secrets: ["chat"], // replace this with an actual secret from env
     secure: process.env.NODE_ENV === "production", // enable this in prod only
-    ...(isProduction
-      ? { domain: "your-production-domain.com", secure: true }
-      : {}),
+    ...(isProduction ? { domain: "chat-maxppw.fly.dev", secure: true } : {}),
   },
 });

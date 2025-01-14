@@ -11,9 +11,7 @@ const sessionStorage = createCookieSessionStorage({
     httpOnly: true,
     sameSite: "lax",
     secrets: ["chat"],
-    ...(isProduction
-      ? { domain: "your-production-domain.com", secure: true }
-      : {}),
+    ...(isProduction ? { domain: "chat-maxppw.fly.dev", secure: true } : {}),
   },
 });
 
