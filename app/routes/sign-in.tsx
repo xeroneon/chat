@@ -14,6 +14,13 @@ export const meta: MetaFunction = () => {
 };
 export const action = async ({ request }: ActionFunctionArgs) => {
   try {
+    // Clone the request
+    const clonedRequest = request.clone();
+
+    // Log the form data from the cloned request
+    const formData = await clonedRequest.formData();
+    console.log("Form data in action:", Object.fromEntries(formData));
+
     const user = await authenticator.authenticate("form", request);
     console.log({ user });
     const session = await sessionStorage.getSession(
