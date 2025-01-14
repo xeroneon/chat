@@ -9,7 +9,7 @@ import { GitHubStrategy } from "remix-auth-github";
 import { createUser, getUser } from "~/db/queries/users";
 import { redirect } from "@remix-run/node";
 
-export const verifyLogin = async (email: string, password: string) => {
+const verifyLogin = async (email: string, password: string) => {
   const user = await getUser(email);
   const match = await bcrypt.compare(password, user[0].passwordHash);
   if (!match) {
@@ -20,8 +20,10 @@ export const verifyLogin = async (email: string, password: string) => {
 
 authenticator.use(
   new FormStrategy(async ({ form }) => {
+    console.log("Form data in strategy:", Object.fromEntries(form));
     const email = form.get("email");
     const password = form.get("password");
+    console.log("Email and password:", { email, password });
 
     if (!email || !password) {
       throw new Error("Email and password are required");
