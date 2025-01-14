@@ -11,6 +11,9 @@ import { redirect } from "@remix-run/node";
 
 const verifyLogin = async (email: string, password: string) => {
   const user = await getUser(email);
+  if (user.length <= 0 || !user[0]?.passwordHash) {
+    throw redirect("/sign-in");
+  }
   const match = await bcrypt.compare(password, user[0].passwordHash);
   if (!match) {
     throw redirect("/sign-in");
@@ -20,11 +23,6 @@ const verifyLogin = async (email: string, password: string) => {
 
 authenticator.use(
   new FormStrategy(async ({ form, request }: FormStrategy.VerifyOptions) => {
-    console.log("Request in strategy", { request });
-    console.log("Form data in strategy:", Object.fromEntries(form));
-
-    const originalFormData = await request.formData();
-    console.log("Strategy form data:", Object.fromEntries(originalFormData));
     const email = form.get("email");
     const password = form.get("password");
     console.log("Email and password:", { email, password });
