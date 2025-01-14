@@ -13,8 +13,8 @@ export const meta: MetaFunction = () => {
   ];
 };
 export const action = async ({ request }: ActionFunctionArgs) => {
+  console.log("request in action sign in", { request });
   try {
-    // Your existing sign-in logic here
     const user = await authenticator.authenticate("form", request);
     const session = await sessionStorage.getSession(
       request.headers.get("cookie")

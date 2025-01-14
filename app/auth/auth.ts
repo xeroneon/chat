@@ -20,6 +20,7 @@ const verifyLogin = async (email: string, password: string) => {
 
 authenticator.use(
   new FormStrategy(async ({ form }) => {
+    console.log("in form strategy", { form });
     const email = form.get("email");
     const password = form.get("password");
 
