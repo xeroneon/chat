@@ -19,8 +19,12 @@ const verifyLogin = async (email: string, password: string) => {
 };
 
 authenticator.use(
-  new FormStrategy(async ({ form }) => {
+  new FormStrategy(async ({ form, request }: FormStrategy.VerifyOptions) => {
+    console.log("Request in strategy", { request });
     console.log("Form data in strategy:", Object.fromEntries(form));
+
+    const originalFormData = await request.formData();
+    console.log("Strategy form data:", Object.fromEntries(originalFormData));
     const email = form.get("email");
     const password = form.get("password");
     console.log("Email and password:", { email, password });

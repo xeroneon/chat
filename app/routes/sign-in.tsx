@@ -14,26 +14,7 @@ export const meta: MetaFunction = () => {
 };
 export const action = async ({ request }: ActionFunctionArgs) => {
   try {
-    console.log("Original request body used:", request.bodyUsed);
-
-    // Read the original form data
-    const originalFormData = await request.formData();
-    console.log("Original form data:", Object.fromEntries(originalFormData));
-
-    // Create a new FormData object
-    const newFormData = new FormData();
-    for (const [key, value] of originalFormData.entries()) {
-      newFormData.append(key, value);
-    }
-
-    // Create a new request with the same method, headers, and the new form data
-    const newRequest = new Request(request.url, {
-      method: request.method,
-      headers: request.headers,
-      body: newFormData,
-    });
-
-    const user = await authenticator.authenticate("form", newRequest);
+    const user = await authenticator.authenticate("form", request);
     console.log({ user });
     const session = await sessionStorage.getSession(
       request.headers.get("cookie")
