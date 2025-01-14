@@ -1,14 +1,11 @@
-import { InferSelectModel, eq } from "drizzle-orm";
+import { InferSelectModel } from "drizzle-orm";
 import { users } from "~/db/schema";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Button } from "./ui/button";
-import {
-  PiPlusCircleDuotone as Add,
-  PiUserCircleDuotone,
-} from "react-icons/pi";
+import { PiPlusCircleDuotone as Add } from "react-icons/pi";
 import { useFetcher } from "@remix-run/react";
 import { action } from "../routes/action.create-friend-request";
 import { MouseEvent, KeyboardEvent } from "react";
+import UserAvatar from "./user-avatar";
 
 type User = InferSelectModel<typeof users>;
 
@@ -56,12 +53,7 @@ export default function UserListItem({ user, isFriend = false }: Props) {
       tabIndex={0}
       aria-label={`Create chat with ${user.username}`}
     >
-      <Avatar className="mr-4">
-        {user?.imageUrl && <AvatarImage src={user.imageUrl} />}
-        <AvatarFallback>
-          <PiUserCircleDuotone size={45} />
-        </AvatarFallback>
-      </Avatar>
+      <UserAvatar className="mr-4" user={user} />
       <h1 className="font-bold text-lg flex-grow">{user.username}</h1>
       {!isFriend && (
         <Button

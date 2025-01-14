@@ -79,7 +79,7 @@ export default function Chat() {
   return (
     <Form
       method="post"
-      className="flex flex-col items-center max-h-screen min-h-screen"
+      className="flex flex-col items-center max-h-dvh min-h-screen"
     >
       <div className="flex fixed top-0 shadow-lg h-[70px] p-4 w-full z-50 items-center bg-slate-100 dark:bg-slate-900">
         <Link to="/" className="">
@@ -91,11 +91,7 @@ export default function Chat() {
         className="grow overflow-y-auto p-4 w-full mt-[55px]"
       >
         {allMessages.map((message) => (
-          <Bubble
-            key={message.messageId}
-            userImage={message?.senderData?.imageUrl}
-            email={message?.senderData?.email}
-          >
+          <Bubble key={message.messageId} user={user}>
             {message.content}
           </Bubble>
         ))}

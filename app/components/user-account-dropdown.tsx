@@ -1,4 +1,3 @@
-import React from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -8,29 +7,21 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { User } from "~/db/schema";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { PiUserCircleDuotone } from "react-icons/pi";
 import { ModeToggle } from "./mode-tottle";
-import { Form, useFetcher } from "@remix-run/react";
+import { useFetcher } from "@remix-run/react";
 import { Button } from "./ui/button";
-import GravatarImage from "./gravatar-image";
+import UserAvatar from "./user-avatar";
 
 type Props = {
   user: User;
 };
 
 export default function UserAccountDropdown({ user }: Props) {
-  const { imageUrl } = user;
   const fetcher = useFetcher();
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
-        <Avatar className="mr-4">
-          {imageUrl && <AvatarImage src={imageUrl} />}
-          <AvatarFallback>
-            <GravatarImage email={user.email} />
-          </AvatarFallback>
-        </Avatar>
+        <UserAvatar user={user} />
       </DropdownMenuTrigger>
       <DropdownMenuContent className="mr-4">
         <DropdownMenuLabel>My Account</DropdownMenuLabel>

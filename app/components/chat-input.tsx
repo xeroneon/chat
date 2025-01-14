@@ -16,7 +16,7 @@ export function ChatInput({ className, ...props }: SearchInputProps) {
         className
       )}
     >
-      <div className="bg-background p-2 rounded-full dark:bg-background">
+      <div className="shadow-lg bg-background p-2 rounded-full dark:bg-background">
         <Input
           type="input"
           name="message"
