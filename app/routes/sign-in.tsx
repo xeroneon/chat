@@ -15,11 +15,17 @@ export const meta: MetaFunction = () => {
 export const action = async ({ request }: ActionFunctionArgs) => {
   try {
     // Clone the request
-    const clonedRequest = request.clone();
+    console.log("Request method:", request.method);
+    console.log("Request headers:", Object.fromEntries(request.headers));
+    console.log("Request body used:", request.bodyUsed);
 
-    // Log the form data from the cloned request
-    const formData = await clonedRequest.formData();
-    console.log("Form data in action:", Object.fromEntries(formData));
+    let formData;
+    try {
+      formData = await request.formData();
+      console.log("Form data in action:", Object.fromEntries(formData));
+    } catch (error) {
+      console.error("Error reading form data:", error);
+    }
 
     const user = await authenticator.authenticate("form", request);
     console.log({ user });
