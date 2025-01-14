@@ -20,9 +20,10 @@ const verifyLogin = async (email: string, password: string) => {
 
 authenticator.use(
   new FormStrategy(async ({ form }) => {
-    console.log("in form strategy", { form });
+    console.log("Form data in strategy:", Object.fromEntries(form));
     const email = form.get("email");
     const password = form.get("password");
+    console.log("Email and password:", { email, password });
 
     if (!email || !password) {
       throw new Error("Email and password are required");
@@ -77,5 +78,6 @@ authenticator.use(
 
       return user[0];
     }
-  )
+  ),
+  "github"
 );

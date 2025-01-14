@@ -13,7 +13,11 @@ export const meta: MetaFunction = () => {
   ];
 };
 export const action = async ({ request }: ActionFunctionArgs) => {
-  console.log("request in action sign in", { request });
+  console.log("Request method:", request.method);
+  console.log("Request headers:", Object.fromEntries(request.headers));
+
+  const formData = await request.formData();
+  console.log("Form data:", Object.fromEntries(formData));
   try {
     const user = await authenticator.authenticate("form", request);
     const session = await sessionStorage.getSession(
