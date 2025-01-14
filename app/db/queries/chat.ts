@@ -48,7 +48,11 @@ export async function getCurrentGroupChatWithMessages(groupId: number) {
     await db.transaction(async (tx) => {
       return Promise.all([groupDetails, groupMembersData, messageQuery]);
     });
+
   const group = groupResult[0];
+  if (!group) {
+    throw new Error(`No group found with id ${groupId}`);
+  }
 
   return {
     groupId: group.groupId,
@@ -56,8 +60,8 @@ export async function getCurrentGroupChatWithMessages(groupId: number) {
     description: group.description,
     createdBy: group.createdBy,
     createdAt: group.createdAt,
-    messages: messagesResult,
-    members: groupMembersResult,
+    messages: messagesResult || [], // Ensure this is always an array
+    members: groupMembersResult || [], // Ensure this is always an array
   };
 }
 
