@@ -7,17 +7,16 @@ export const authenticator = new Authenticator<User>();
 import { FormStrategy } from "remix-auth-form";
 import { GitHubStrategy } from "remix-auth-github";
 import { createUser, getUser } from "~/db/queries/users";
-import { redirect } from "@remix-run/node";
-import { CustomFormStrategy } from "./custom-form-strategy";
 
 export const verifyLogin = async (email: string, password: string) => {
   const user = await getUser(email);
+  console.log({ user });
   if (user.length <= 0 || !user[0]?.passwordHash) {
-    throw redirect("/sign-in");
+    throw new Error("No user was returned");
   }
   const match = await bcrypt.compare(password, user[0].passwordHash);
   if (!match) {
-    throw redirect("/sign-in");
+    throw new Error("Passwords do not match");
   }
   return user;
 };
@@ -26,7 +25,6 @@ authenticator.use(
   new FormStrategy(async ({ form, request }: FormStrategy.VerifyOptions) => {
     const email = form.get("email");
     const password = form.get("password");
-    console.log("Email and password:", { email, password });
 
     if (!email || !password) {
       throw new Error("Email and password are required");

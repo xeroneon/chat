@@ -1,9 +1,10 @@
-import { MetaFunction } from "@remix-run/react";
+import { MetaFunction, useActionData } from "@remix-run/react";
 import { ActionFunctionArgs, data, redirect } from "@remix-run/node";
 import { SignUpForm } from "~/components/signup-form";
 import { createUser, getUser } from "~/db/queries/users";
 import * as bcrypt from "bcrypt";
 import { sessionStorage } from "~/services/session.server";
+import { toast } from "~/hooks/use-toast";
 
 export const meta: MetaFunction = () => {
   return [
@@ -19,34 +20,27 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const password = formData.get("password");
 
   if (!password) {
-    throw {};
+    throw data({ errors: { general: "No password provided" } });
   }
 
   const existingUser = await getUser(email);
-  console.log({ existingUser });
 
   if (existingUser.length) {
-    return data(
-      { errors: { general: "This user already exists" } },
-      { status: 500 }
-    );
+    return data({ errors: { userExists: true } }, { status: 500 });
   }
 
   const passwordHash = await bcrypt.hash(password as string, 10);
-  console.log({ passwordHash });
 
   const user = await createUser({
     email,
     passwordHash,
     username,
   });
-  console.log("create user", { user });
 
   const session = await sessionStorage.getSession(
     request.headers.get("cookie")
   );
   session.set("user", user);
-  console.log("session set");
 
   throw redirect("/", {
     headers: { "Set-Cookie": await sessionStorage.commitSession(session) },
@@ -54,6 +48,15 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 };
 
 export default function Signup() {
+  const actionData = useActionData<typeof action>();
+  if (actionData?.errors?.userExists) {
+    toast({
+      title: "User already exists with that email",
+      description: "Please sign up using a different email",
+      variant: "destructive",
+    });
+  }
+
   return (
     <div className="flex flex-col items-center h-screen">
       <h1 className="flex items-center justify-center h-40 text-5xl font-instrument font-bold">

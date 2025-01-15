@@ -1,9 +1,13 @@
-import { ActionFunctionArgs, redirect, ErrorResponse } from "@remix-run/node";
-import { MetaFunction, useFetcher, useLoaderData } from "@remix-run/react";
-import React from "react";
-import { useTheme } from "remix-themes";
-import { authenticator, verifyLogin } from "~/auth/auth";
+import { ActionFunctionArgs, data, redirect } from "@remix-run/node";
+import {
+  Form,
+  MetaFunction,
+  useActionData,
+  useFetcher,
+} from "@remix-run/react";
+import { verifyLogin } from "~/auth/auth";
 import { LoginForm } from "~/components/login-form";
+import { toast } from "~/hooks/use-toast";
 import { sessionStorage } from "~/services/session.server";
 
 export const meta: MetaFunction = () => {
@@ -19,33 +23,38 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     const password = formData.get("password") as string;
 
     if (!email || !password) {
-      throw new Error("Email and password are required");
+      return data({ error: "Email or password required" }, { status: 400 });
     }
 
     const user = await verifyLogin(email.toString(), password.toString());
-    console.log({ user });
+
+    if (user.length <= 0) {
+      return data({ error: "No matching user found" }, { status: 400 });
+    }
+
     const session = await sessionStorage.getSession(
       request.headers.get("cookie")
     );
+
     session.set("user", user[0]);
 
     return redirect("/", {
       headers: { "Set-Cookie": await sessionStorage.commitSession(session) },
     });
   } catch (error) {
-    console.error("Sign-in error:", error);
-    // You can throw a more specific error here if needed
-    throw new Response("Sign-in failed", { status: 500 });
+    return data({ error: "Sign-in failed" }, { status: 500 });
   }
 };
 export default function Signin() {
-  const { Form } = useFetcher();
+  const actionData = useActionData<typeof action>();
+  if (actionData?.error) {
+    toast({
+      title: actionData.error,
+      variant: "destructive",
+    });
+  }
   return (
-    <Form
-      method="post"
-      action="/sign-in"
-      className="flex flex-col items-center h-screen"
-    >
+    <Form method="post" className="flex flex-col items-center h-screen">
       <h1 className="flex items-center justify-center text-5xl h-40 text-center font-instrument font-bold">
         Chat
       </h1>

@@ -66,8 +66,6 @@ export async function getCurrentGroupChatWithMessages(groupId: number) {
 }
 
 export async function getChats(userId: number) {
-  console.log("in chats");
-  console.log({ userId });
   const chats = await db
     .select({
       groupId: groups.groupId,
@@ -105,7 +103,6 @@ export async function getChats(userId: number) {
       )
     )
     .orderBy(desc(sql`last_message_time`));
-  console.log({ chats });
 
   // Group results by groupId
   const groupedChats = chats.reduce(

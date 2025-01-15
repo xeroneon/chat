@@ -63,19 +63,19 @@ export function SignUpForm({
               <Button type="submit" className="w-full">
                 Sign Up
               </Button>
-              <fetcher.Form method="post" action="/auth/github">
-                <Button type="submit" className="w-full">
-                  Sign Up with github
-                </Button>
-              </fetcher.Form>
-            </div>
-            <div className="mt-4 text-center text-sm">
-              Already have an account?{" "}
-              <Link to="/sign-in" className="underline underline-offset-4">
-                Sign In
-              </Link>
             </div>
           </Form>
+          <fetcher.Form method="post" action="/auth/github" className="mt-4">
+            <Button type="submit" disabled className="w-full">
+              Sign Up with github
+            </Button>
+          </fetcher.Form>
+          <div className="mt-4 text-center text-sm">
+            Already have an account?{" "}
+            <Link to="/sign-in" className="underline underline-offset-4">
+              Sign In
+            </Link>
+          </div>
         </CardContent>
       </Card>
     </div>

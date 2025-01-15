@@ -13,6 +13,7 @@ import { themeSessionResolver } from "./sessions.server";
 import { ThemeProvider, useTheme } from "remix-themes";
 import clsx from "clsx";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Toaster } from "./components/ui/toaster";
 
 const queryClient = new QueryClient();
 
@@ -54,6 +55,7 @@ export function App() {
       </head>
       <body className="bg-background text-foreground">
         <Outlet />
+        <Toaster />
         <ScrollRestoration />
         <Scripts />
       </body>
