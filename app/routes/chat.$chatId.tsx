@@ -1,5 +1,10 @@
 import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { Link, useFetcher, useLoaderData } from "@remix-run/react";
+import {
+  Link,
+  useActionData,
+  useFetcher,
+  useLoaderData,
+} from "@remix-run/react";
 import { getCurrentGroupChatWithMessages } from "~/db/queries/chat";
 import { ChatInput } from "~/components/chat-input";
 import { createMessage } from "~/db/queries/messages";
@@ -45,10 +50,17 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
 export default function Chat() {
   const { chatData, user } = useLoaderData<typeof loader>();
   const messages = [...chatData.messages].reverse();
-  const { Form } = useFetcher();
+  const { Form, data } = useFetcher<typeof action>();
   const [allMessages, setAllMessages] = useState(messages);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const formRef = useRef<HTMLFormElement>(null);
+
+  useEffect(() => {
+    if (formRef.current) {
+      formRef.current.reset();
+    }
+  }, [data]);
 
   useEffect(() => {
     const eventSource = new EventSource(`/chat/${chatData.groupId}/events`);
@@ -78,6 +90,7 @@ export default function Chat() {
 
   return (
     <Form
+      ref={formRef}
       method="post"
       className="flex flex-col items-center max-h-dvh min-h-screen"
     >
