@@ -1,7 +1,7 @@
 import { LoaderFunctionArgs } from "@remix-run/node";
 import { db } from "../db";
-import { User, users } from "../schema";
-import { eq } from "drizzle-orm";
+import { friendRequests, friendships, User, users } from "../schema";
+import { eq, or, and, ilike, ne } from "drizzle-orm";
 import { sessionStorage } from "~/services/session.server";
 
 export async function getUser(email: string) {
@@ -49,3 +49,55 @@ export async function createUser({
     throw error;
   }
 }
+
+export async function SearchUsers(query: string, currentUser: User) {
+  const searchResults = await db
+    .select({
+      user: users,
+      friendshipStatus: friendships.becameFriendsAt,
+      friendRequestStatus: friendRequests.status,
+    })
+    .from(users)
+    .leftJoin(
+      friendships,
+      or(
+        and(
+          eq(friendships.userId1, users.userId),
+          eq(friendships.userId2, currentUser.userId!)
+        ),
+        and(
+          eq(friendships.userId2, users.userId),
+          eq(friendships.userId1, currentUser.userId!)
+        )
+      )
+    )
+    .leftJoin(
+      friendRequests,
+      and(
+        or(
+          and(
+            eq(friendRequests.senderId, users.userId),
+            eq(friendRequests.receiverId, currentUser.userId!)
+          ),
+          and(
+            eq(friendRequests.receiverId, users.userId),
+            eq(friendRequests.senderId, currentUser.userId!)
+          )
+        ),
+        eq(friendRequests.status, "pending")
+      )
+    )
+    .where(
+      and(
+        or(
+          ilike(users.username, `%${query}%`),
+          ilike(users.email, `%${query}%`)
+        ),
+        ne(users.userId, currentUser.userId!)
+      )
+    );
+
+  return searchResults;
+}
+
+export type UserSearchResults = Awaited<ReturnType<typeof SearchUsers>>;
