@@ -1,20 +1,15 @@
 import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import {
-  Link,
-  useActionData,
-  useFetcher,
-  useLoaderData,
-} from "@remix-run/react";
+import { Link, useFetcher, useLoaderData } from "@remix-run/react";
 import { getCurrentGroupChatWithMessages } from "~/db/queries/chat";
 import { ChatInput } from "~/components/chat-input";
 import { createMessage } from "~/db/queries/messages";
 import Bubble from "~/components/bubble";
-import { getCurrentUser, getUser } from "~/db/queries/users";
+import { getCurrentUser } from "~/db/queries/users";
 import { redis } from "~/services/redis.server";
 import { useEffect, useRef, useState } from "react";
 import { isAuthenticated } from "~/utils/isAuthenticated.server";
 import { User } from "~/db/schema";
-import clsx from "clsx";
+import { format } from "date-fns";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const { chatId } = args.params;
@@ -111,11 +106,17 @@ export default function Chat() {
         ref={messagesContainerRef}
         className="grow overflow-y-auto p-4 w-full mt-[55px]"
       >
-        {allMessages.map((message) => (
+        {allMessages.map((message, i) => (
           <Bubble
             key={message.messageId}
             user={message.senderData as User}
+            sentAt={format(message.sentAt!, "h:mm")}
             currentUser={user.userId === message?.senderData?.userId}
+            hideAvatar={
+              i > 0 &&
+              allMessages[i - 1]?.senderData?.userId ===
+                message?.senderData?.userId
+            }
           >
             {message.content}
           </Bubble>
