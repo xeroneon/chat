@@ -23,6 +23,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   }
 
   const existingUser = await getUser(email);
+  console.log({ existingUser });
 
   if (existingUser.length) {
     return data(
@@ -32,17 +33,20 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   }
 
   const passwordHash = await bcrypt.hash(password as string, 10);
+  console.log({ passwordHash });
 
   const user = await createUser({
     email,
     passwordHash,
     username,
   });
+  console.log("create user", { user });
 
   const session = await sessionStorage.getSession(
     request.headers.get("cookie")
   );
   session.set("user", user);
+  console.log("session set");
 
   throw redirect("/", {
     headers: { "Set-Cookie": await sessionStorage.commitSession(session) },

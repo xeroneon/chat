@@ -27,7 +27,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     const session = await sessionStorage.getSession(
       request.headers.get("cookie")
     );
-    session.set("user", user);
+    session.set("user", user[0]);
 
     return redirect("/", {
       headers: { "Set-Cookie": await sessionStorage.commitSession(session) },
