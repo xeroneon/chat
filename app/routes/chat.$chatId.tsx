@@ -32,7 +32,7 @@ export const action = async (args: ActionFunctionArgs) => {
     return {};
   }
 
-  const user = getCurrentUser(args);
+  const user = await getCurrentUser(args);
 
   const messageResult = await createMessage({
     groupId: parseInt(chatId, 10),
@@ -53,7 +53,7 @@ export const action = async (args: ActionFunctionArgs) => {
 export default function Chat() {
   const { chatData, user } = useLoaderData<typeof loader>();
   const messages = [...chatData.messages].reverse();
-  const { Form, data } = useFetcher<typeof action>();
+  const { Form, data, state } = useFetcher<typeof action>();
   const [allMessages, setAllMessages] = useState(messages);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
@@ -70,6 +70,7 @@ export default function Chat() {
 
     eventSource.onmessage = (event) => {
       const message = JSON.parse(event.data);
+      console.log({ message });
       setAllMessages((prev) => [...prev, JSON.parse(message?.data)]);
       setIsInitialLoad(false);
     };
@@ -123,7 +124,7 @@ export default function Chat() {
         ))}
         {allMessages.length <= 0 && <p>No messages have been sent</p>}
       </div>
-      <ChatInput />
+      <ChatInput disabled={state !== "idle"} required min="1" />
       <input name="userId" defaultValue={user.userId} className="hidden" />
     </Form>
   );
