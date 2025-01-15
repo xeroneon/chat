@@ -5,11 +5,24 @@ import {
 } from "@remix-run/node";
 import { PiChatTeardropDuotone } from "react-icons/pi";
 import { Button } from "~/components/ui/button";
-import { useLoaderData, useNavigate } from "@remix-run/react";
+import { useLoaderData, useLocation, useNavigate } from "@remix-run/react";
 import { getChats } from "~/db/queries/chat";
 import ChatListItem from "~/components/chat-list-item";
 import { sessionStorage } from "~/services/session.server";
 import UserAccountDropdown from "~/components/user-account-dropdown";
+import { motion } from "framer-motion";
+
+const pageVariants = {
+  initial: { opacity: 0, x: "100%" },
+  in: { opacity: 1, x: 0 },
+  out: { opacity: 0, x: "-100%" },
+};
+
+const pageTransition = {
+  type: "tween",
+  ease: "anticipate",
+  duration: 0.5,
+};
 
 export const meta: MetaFunction = () => {
   return [
@@ -30,6 +43,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 };
 
 export default function Index() {
+  const location = useLocation();
   const { chats, user } = useLoaderData<typeof loader>();
   const navigate = useNavigate();
   return (
