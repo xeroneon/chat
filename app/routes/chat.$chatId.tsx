@@ -9,10 +9,11 @@ import { getCurrentGroupChatWithMessages } from "~/db/queries/chat";
 import { ChatInput } from "~/components/chat-input";
 import { createMessage } from "~/db/queries/messages";
 import Bubble from "~/components/bubble";
-import { getCurrentUser } from "~/db/queries/users";
+import { getCurrentUser, getUser } from "~/db/queries/users";
 import { redis } from "~/services/redis.server";
 import { useEffect, useRef, useState } from "react";
 import { isAuthenticated } from "~/utils/isAuthenticated.server";
+import { User } from "~/db/schema";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const { chatId } = args.params;
@@ -24,7 +25,8 @@ export const loader = async (args: LoaderFunctionArgs) => {
   return { chatData, user };
 };
 
-export const action = async ({ request, params }: ActionFunctionArgs) => {
+export const action = async (args: ActionFunctionArgs) => {
+  const { request, params } = args;
   const { chatId } = params;
   const formData = await request.formData();
   const message = formData.get("message") as string;
@@ -34,6 +36,8 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
     return {};
   }
 
+  const user = getCurrentUser(args);
+
   const messageResult = await createMessage({
     groupId: parseInt(chatId, 10),
     userId: parseInt(userId, 10),
@@ -42,7 +46,10 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
 
   const channelName = `chat:${chatId}`;
 
-  await redis.publish(channelName, JSON.stringify(messageResult));
+  await redis.publish(
+    channelName,
+    JSON.stringify({ ...messageResult, senderData: user })
+  );
 
   return { messageResult };
 };
@@ -104,7 +111,7 @@ export default function Chat() {
         className="grow overflow-y-auto p-4 w-full mt-[55px]"
       >
         {allMessages.map((message) => (
-          <Bubble key={message.messageId} user={user}>
+          <Bubble key={message.messageId} user={message.senderData as User}>
             {message.content}
           </Bubble>
         ))}
