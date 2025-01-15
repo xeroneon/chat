@@ -14,6 +14,7 @@ import { redis } from "~/services/redis.server";
 import { useEffect, useRef, useState } from "react";
 import { isAuthenticated } from "~/utils/isAuthenticated.server";
 import { User } from "~/db/schema";
+import clsx from "clsx";
 
 export const loader = async (args: LoaderFunctionArgs) => {
   const { chatId } = args.params;
@@ -111,7 +112,11 @@ export default function Chat() {
         className="grow overflow-y-auto p-4 w-full mt-[55px]"
       >
         {allMessages.map((message) => (
-          <Bubble key={message.messageId} user={message.senderData as User}>
+          <Bubble
+            key={message.messageId}
+            user={message.senderData as User}
+            currentUser={user.userId === message?.senderData?.userId}
+          >
             {message.content}
           </Bubble>
         ))}
