@@ -8,8 +8,9 @@ import { FormStrategy } from "remix-auth-form";
 import { GitHubStrategy } from "remix-auth-github";
 import { createUser, getUser } from "~/db/queries/users";
 import { redirect } from "@remix-run/node";
+import { CustomFormStrategy } from "./custom-form-strategy";
 
-const verifyLogin = async (email: string, password: string) => {
+export const verifyLogin = async (email: string, password: string) => {
   const user = await getUser(email);
   if (user.length <= 0 || !user[0]?.passwordHash) {
     throw redirect("/sign-in");
@@ -68,7 +69,6 @@ authenticator.use(
       const primaryEmail = emails.find((email: any) => email.primary)?.email;
 
       const user = await getUser(primaryEmail);
-
       if (!user || user.length === 0) {
         const newUser = await createUser({
           username: githubUser.login,

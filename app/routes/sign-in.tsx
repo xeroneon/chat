@@ -2,7 +2,7 @@ import { ActionFunctionArgs, redirect, ErrorResponse } from "@remix-run/node";
 import { MetaFunction, useFetcher, useLoaderData } from "@remix-run/react";
 import React from "react";
 import { useTheme } from "remix-themes";
-import { authenticator } from "~/auth/auth";
+import { authenticator, verifyLogin } from "~/auth/auth";
 import { LoginForm } from "~/components/login-form";
 import { sessionStorage } from "~/services/session.server";
 
@@ -14,7 +14,15 @@ export const meta: MetaFunction = () => {
 };
 export const action = async ({ request }: ActionFunctionArgs) => {
   try {
-    const user = await authenticator.authenticate("form", request);
+    const formData = await request.formData();
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+
+    if (!email || !password) {
+      throw new Error("Email and password are required");
+    }
+
+    const user = await verifyLogin(email.toString(), password.toString());
     console.log({ user });
     const session = await sessionStorage.getSession(
       request.headers.get("cookie")

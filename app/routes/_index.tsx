@@ -24,8 +24,9 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   );
   const user = session.get("user");
   if (!user) throw redirect("/sign-in");
-
-  const chats = await getChats(parseInt(user.userId, 10));
+  console.log("before load chats", { user });
+  const chats = await getChats(parseInt(user[0].userId, 10));
+  console.log("after load chats");
 
   return { chats, user };
 };

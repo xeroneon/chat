@@ -6,7 +6,7 @@ type Props = {
 };
 
 function GravatarImage({ email, size = 80 }: Props) {
-  const hash = md5(email.trim().toLowerCase());
+  const hash = md5(email?.trim()?.toLowerCase() ?? "");
   const gravatarUrl = `https://www.gravatar.com/avatar/${hash}?s=${size}&d=identicon`;
 
   return <img src={gravatarUrl} alt="User avatar" />;
